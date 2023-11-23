@@ -60,7 +60,7 @@
 
 #define Y_STOP_PIN                          PC14
 
-//PE3通常接Probe
+//PE3 is usually connected to Probe
 //PC13-Z_MIN_PIN
 //PF11-Z_MAX_PIN
 #define Z_MIN_PIN                           PC13
@@ -108,7 +108,7 @@
 #define E1_STEP_PIN                         PB1
 #define E1_DIR_PIN                          PF13
 
-#if NEED_HEAT_HEAD //如果不需要加热喷嘴,disable这一块
+#if NEED_HEAT_HEAD //If you do not need to heat the nozzle, disable this piece
 //
 // Temperature Sensors
 //
@@ -130,11 +130,11 @@
 #endif
 #if ENABLED(SPINDLE_LASER_USE_PWM)
 #define SPINDLE_LASER_PWM_PIN                 PB10 //wifi:RX-TIM2_CH3
-//这里必须复合PeripheralPins.c中的PWM pin定义const PinMap PinMap_PWM[]
-//详见PWM_PIN(x)定义
+//This must be combined with the PWM pin definition in PeripheralPins.c const PinMap PinMap_PWM[]
+//See PWM_PIN(x) definition for details
 #endif
 #if NUM_SERVOS > 0
-#define SERVO0_PIN                            PB10 //使能NUM_SERVOS>1后开放,注意,它与激光共用一个引脚,所以不能同时开启
+#define SERVO0_PIN                            PB10 //Open after enabling NUM_SERVOS>1. Note that it shares a pin with the laser, so it cannot be opened at the same time.
 #endif
 
 #if NEED_HEAT_BED
@@ -159,13 +159,13 @@
 //
 #define BEEPER_PIN                          PA8
 //#define LED_PIN                           PG10
-#define PS_ON_PIN                           PG10 //YSZ-COMMENT:暂时以LED模拟开关机
+#define PS_ON_PIN                           PG10 //YSZ-COMMENT:Temporarily use LED to simulate the switch
 #if TRONXY_BACKUP_POWER
-#define POWER_LOSS_PIN                      PF11 // 配置成下拉输入
+#define POWER_LOSS_PIN                      PF11 // Configure as drop-down input
 #else
-#define POWER_LOSS_PIN                      PE1 // PW_DET YSZ-COMMENT:这里接的是比较器LM393的输出,配置成上拉输入
+#define POWER_LOSS_PIN                      PE1 // PW_DET YSZ-COMMENT:What is connected here is the output of the comparator LM393, which is configured as a pull-up input.
 #endif
-#define POWER_LM393_PIN                     PE0 //YSZ-COMMENT:这里接的是比较器LM393的正极,必须配置成输出,高电平
+#define POWER_LM393_PIN                     PE0 //YSZ-COMMENT:What is connected here is the positive pole of the comparator LM393, which must be configured as output, high level
 
 #ifndef FIL_RUNOUT_PIN
   #define FIL_RUNOUT_PIN                    PF12  // MT_DET
@@ -261,4 +261,4 @@
 #define HAS_OTG_USB_HOST_SUPPORT
 #endif
 
-#define SPEAKER //蜂鸣器无源
+#define SPEAKER //Buzzer passive

@@ -219,7 +219,7 @@ void GcodeSuite::G28() {
   #endif
 
   #if ENABLED(DUAL_X_CARRIAGE)
-    #if !TRONXY_UI //这里不能恢复复制的标志,否则复位后,再移动会撞头
+    #if !TRONXY_UI //The copied mark cannot be restored here, otherwise after resetting, moving again will hit the head.
     bool IDEX_saved_duplication_state = extruder_duplication_enabled;
     #endif
     DualXMode IDEX_saved_mode = dual_x_carriage_mode;
@@ -418,7 +418,7 @@ void GcodeSuite::G28() {
     if(doZ) {
       if((READ(Z_MAX_PIN) != Z_MAX_ENDSTOP_INVERTING
       TERN_(Z_MULTI_ENDSTOPS,|| READ(Z2_MAX_PIN) != Z2_MAX_ENDSTOP_INVERTING))
-      && READ(Z_MIN_PROBE_PIN) != Z_MIN_PROBE_ENDSTOP_INVERTING) { //限位和探头都触发,这显然不合理
+      && READ(Z_MIN_PROBE_PIN) != Z_MIN_PROBE_ENDSTOP_INVERTING) { //Both the limit and the probe are triggered, which is obviously unreasonable
         #if TRONXY_UI
         popupZLimitError();
         #endif
@@ -428,13 +428,13 @@ void GcodeSuite::G28() {
       }
       int t = 0;
       while((READ(Z_MAX_PIN) != Z_MAX_ENDSTOP_INVERTING
-      TERN_(Z_MULTI_ENDSTOPS,|| READ(Z2_MAX_PIN) != Z2_MAX_ENDSTOP_INVERTING)) //限位触发,上抬
+      TERN_(Z_MULTI_ENDSTOPS,|| READ(Z2_MAX_PIN) != Z2_MAX_ENDSTOP_INVERTING)) //Limit trigger, lift up
       && t++ < 5) {
         current_position.z -= 2;
         line_to_current_position(2.0);
         planner.synchronize();
       }
-      if(t >= 5) { //传感器异常
+      if(t >= 5) { //Sensor abnormality
         #if TRONXY_UI
         popupZLimitError();
         #endif
@@ -527,12 +527,12 @@ void GcodeSuite::G28() {
           probe.move_z_after_homing();
         }
       #endif
-    #if USE_Z_LIMIT_PROBE_0 /*上面只是找了Z限位,现在要找probe零点*/
-      #if Z_HOME_DIR > 0 //大端复位
+    #if USE_Z_LIMIT_PROBE_0 /*I just found the Z limit above, now I want to find the probe zero point.*/
+      #if Z_HOME_DIR > 0 //big endian reset
         uint8_t home_probe_z = parser.intval('S',1);
-        if(doZ && home_probe_z && !probe.deploy()) { //在断电续打的时候,不能探测Z高度
+        if(doZ && home_probe_z && !probe.deploy()) { //When the power is cut off and the game is resumed, the Z height cannot be detected.
           sync_plan_position();
-          float zpos = current_position.z; //记录当前高度
+          float zpos = current_position.z; //Record current altitude
           #if ENABLED(Z_SAFE_HOMING)
             constexpr xy_float_t safe_homing_xy = { Z_SAFE_HOMING_X_POINT, Z_SAFE_HOMING_Y_POINT };
             #if HAS_HOME_OFFSET
@@ -552,7 +552,7 @@ void GcodeSuite::G28() {
             }
           #endif
           if (!probe.deploy()) { 
-            probe.probe_down_to_z(-(soft_endstop.max.z * 1.5),MMM_TO_MMS(Z_PROBE_FEEDRATE_FAST));//probe探测Z直到触发probe,结束后更新current_position
+            probe.probe_down_to_z(-(soft_endstop.max.z * 1.5),MMM_TO_MMS(Z_PROBE_FEEDRATE_FAST)); //The probe detects Z until the probe is triggered, and then updates the current_position
             float bump = _MAX(Z_CLEARANCE_BETWEEN_PROBES, home_bump_mm(Z_AXIS));
             if (bump) {
               current_position.z += bump;
@@ -562,7 +562,7 @@ void GcodeSuite::G28() {
             }
             probe.stow();
             PrintJobRecovery::info.zBottomPos = zpos - current_position.z;
-            // 探测点停下的Z位置为0-probe-offset.z
+            // The Z position where the detection point stops is 0-probe-offset.z
             #if TRONXY_UI
             PrintJobRecovery::info.zBottomPos += -Probe_Offset.z;
             current_position.z = -Probe_Offset.z;
@@ -576,7 +576,7 @@ void GcodeSuite::G28() {
           probe.move_z_after_homing();
           #endif
         }
-      #else //小端复位
+      #else //little endian reset
         if (doZ && !probe.deploy()) {
           probe.probe_down_to_z(-(soft_endstop.max.z * 1.5),MMM_TO_MMS(Z_PROBE_FEEDRATE_FAST));
           float bump = _MAX(Z_CLEARANCE_BETWEEN_PROBES, home_bump_mm(Z_AXIS));
@@ -645,7 +645,7 @@ void GcodeSuite::G28() {
       idex_set_parked();
 
       dual_x_carriage_mode = IDEX_saved_mode;
-      #if TRONXY_UI //这里不能恢复复制的标志,否则复位后,再移动会撞头
+      #if TRONXY_UI //The copied mark cannot be restored here, otherwise after resetting, moving again will hit the head.
       stepper.set_directions();
       #else
       set_duplication_enabled(IDEX_saved_duplication_state);
@@ -735,7 +735,7 @@ void GcodeSuite::G28() {
     my_print_status = PRINT_RUNNING;
     if(enabled_taoli)WRITE(pin_air,TAOLI_AIR_OPEN);
     #if ENABLED(BABYSTEPPING)
-    int t = babystep.steps[BS_AXIS_IND(Z_AXIS)] = babystep.accum; //承继上次打印的babystep
+    int t = babystep.steps[BS_AXIS_IND(Z_AXIS)] = babystep.accum; //Inherit the last printed babystep
     while(t != 0)t = babystep.steps[BS_AXIS_IND(Z_AXIS)];
     #endif
   }

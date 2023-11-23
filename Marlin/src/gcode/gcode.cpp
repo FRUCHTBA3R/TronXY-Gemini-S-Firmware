@@ -1100,7 +1100,7 @@ void GcodeSuite::process_parsed_command(const bool no_ok/*=false*/) {
             printTotalTime = parser.ulongval('T',0);
           }
           break;
-        case 8001: //开始打印
+        case 8001: //Start printing
           if(my_print_status >= PRINT_RUNNING)SERIAL_ECHO("M8001-3");
           else if(my_print_status == PRINT_ERROR)SERIAL_ECHO("M8001-1");
           // else if(planner.has_blocks_queued() || queue.has_commands_queued() || wait_for_heatup)SERIAL_ECHO("M8001-2");
@@ -1109,7 +1109,7 @@ void GcodeSuite::process_parsed_command(const bool no_ok/*=false*/) {
             SERIAL_ECHO("M8001-0");
           }
           break;
-        case 8002: //暂停
+        case 8002: //pause
           if(my_print_status == PRINT_RUNNING_SERIAL) {
             SERIAL_ECHO("M8002-1ok\n");
             pauseMotion();
@@ -1119,7 +1119,7 @@ void GcodeSuite::process_parsed_command(const bool no_ok/*=false*/) {
           else if(my_print_status == PRINT_PAUSE_SERIAL)SERIAL_ECHO("M8002-0");
           else SERIAL_ECHO("M8002-3");
           break;
-        case 8003: //恢复打印
+        case 8003: //Resume printing
           if(my_print_status == PRINT_PAUSE_SERIAL) {
             SERIAL_ECHO("M8003-1ok\n");
             resumeMotion();
@@ -1129,7 +1129,7 @@ void GcodeSuite::process_parsed_command(const bool no_ok/*=false*/) {
           else if(my_print_status == PRINT_RUNNING_SERIAL)SERIAL_ECHO("M8003-0");
           else SERIAL_ECHO("M8003-3");
           break;
-        case 8004: //停止打印
+        case 8004: //Stop printing
           if(my_print_status < PRINT_RUNNING)SERIAL_ECHO("M8004-0");
           else {
             wait_for_user = false;
@@ -1137,7 +1137,7 @@ void GcodeSuite::process_parsed_command(const bool no_ok/*=false*/) {
             SERIAL_ECHO("M8004-1");
           }
           break;
-        case 8007: //持续进/退料
+        case 8007: //Continuous feeding/returning of materials
           if(parser.seen('S'))
           {
             int v = parser.intval('S');
@@ -1153,11 +1153,11 @@ void GcodeSuite::process_parsed_command(const bool no_ok/*=false*/) {
             yevt.setEvt(TASK_LOOP,LOOPEVT_BASE,keepEMove);
           }
           break;
-        case 8008: //恢复出厂设置
+        case 8008: //reset
           SERIAL_ECHO("M8008-0ok\n");
           screenFactoryReset();
           break;
-        case 8009: //设置babystep
+        case 8009: //Set up babystep
           if(parser.seen('S')) {
             float v = parser.floatval('S');
             babystep.add_mm(Z_AXIS,v);
@@ -1166,7 +1166,7 @@ void GcodeSuite::process_parsed_command(const bool no_ok/*=false*/) {
             SERIAL_ECHO(str);
           }
           break;
-        case 8110://陶泥切换联动模式
+        case 8110://Tao Ni switches linkage mode
           #if TAOLI_SERIAL
           if(parser.seen('S')) {
             int v = parser.intval('S');
@@ -1179,7 +1179,7 @@ void GcodeSuite::process_parsed_command(const bool no_ok/*=false*/) {
           SERIAL_ECHO("M8110 S1");
           #endif
           break;
-        case 8111: //设置进料速比
+        case 8111: //Set feed speed ratio
           #if TAOLI_SERIAL
           if(parser.seen('S')) {
             float v = parser.floatval('S');
@@ -1197,7 +1197,7 @@ void GcodeSuite::process_parsed_command(const bool no_ok/*=false*/) {
           #if TAOLI_SERIAL
           {
             int index = INDEX_FIFTH_EFACTOR;
-            persistentStore.write_data(index,(const uint8_t*)&fifth_e_factor,sizeof(fifth_e_factor));//保存e转比
+            persistentStore.write_data(index,(const uint8_t*)&fifth_e_factor,sizeof(fifth_e_factor));//Save e-conversion ratio
             SERIAL_ECHO("M8112 S0");
           }
           #endif
@@ -1208,16 +1208,16 @@ void GcodeSuite::process_parsed_command(const bool no_ok/*=false*/) {
           #endif
           break;
         
-        //8200--8299立即执行的命令
-        case 8200: //急停
+        //8200-8299 command to be executed immediately
+        case 8200: //emergency stop
           stopEmergency();
           break;
-        case 8201: //暂停,续打
+        case 8201: //Pause, continue playing
           if(parser.intval('S') == 1) {
             tronxyPause();
           }
           else {
-            if(my_print_status == PRINT_PAUSE && wait_for_user) { //一定要等wait_for_user置true
+            if(my_print_status == PRINT_PAUSE && wait_for_user) { //Be sure to wait for wait_for_user to be set to true
               my_print_status = PRINT_RESUME;
 					    wait_for_user = false;
             }
@@ -1230,7 +1230,7 @@ void GcodeSuite::process_parsed_command(const bool no_ok/*=false*/) {
             int i;
             char astr[32];
             const char* tstr = parser.string_arg;
-            while(*tstr && IS_SPACE(*tstr))tstr++; //跳过空格
+            while(*tstr && IS_SPACE(*tstr))tstr++; //skip spaces
             if(*tstr) {
               for(i = 0; *tstr && !IS_SPACE(*tstr) && i < 31; i++) {
                 astr[i] = *tstr;
@@ -1263,7 +1263,7 @@ void GcodeSuite::process_parsed_command(const bool no_ok/*=false*/) {
             char astr[32];
             const char* tstr = parser.string_arg;
             for(int t = 0; t < 2; t++) {
-              while(*tstr && IS_SPACE(*tstr))tstr++; //跳过空格
+              while(*tstr && IS_SPACE(*tstr))tstr++; //skip spaces
               if(*tstr) {
                 for(i = 0; *tstr && !IS_SPACE(*tstr) && i < 31; i++) {
                   astr[i] = *tstr;
@@ -1325,7 +1325,7 @@ void GcodeSuite::process_parsed_command(const bool no_ok/*=false*/) {
     default:
       #if TRONXY_UI
         if(parser.command_ptr[0] == ';') {
-          if(parser.command_ptr[1] == 'T' && //获取cura切片软件的时间
+          if(parser.command_ptr[1] == 'T' && //Get the time of cura slicing software
           parser.command_ptr[2] == 'I' && 
           parser.command_ptr[3] == 'M' && 
           parser.command_ptr[4] == 'E' && 

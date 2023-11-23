@@ -853,7 +853,7 @@ void idle(bool no_stepper_sleep/*=false*/) {
   TERN_(SDSUPPORT, card.manage_media());
 
   // Handle USB Flash Drive insert / remove
-  TERN_(USB_FLASH_DRIVE_SUPPORT, card.diskIODriver()->idle());//YSZ-COMMENT:这里不停的执行USB的idle(),里面执行USB_Process可以检测到USB插入与拔出
+  TERN_(USB_FLASH_DRIVE_SUPPORT, card.diskIODriver()->idle()); // YSZ-COMMENT:USB idle() is continuously executed here, and USB_Process is executed inside to detect USB insertion and removal.
 
   // Announce Host Keepalive state (if any)
   TERN_(HOST_KEEPALIVE_FEATURE, gcode.host_keepalive());
@@ -1164,7 +1164,7 @@ void tronxy_config_init(void)
   #else
   enabled_auto_bed_leveling = 0;
   #endif
-  #if USE_Z_LIMIT_PROBE_0 //Z限位+探头机型
+  #if USE_Z_LIMIT_PROBE_0 //Z limit + probe model
     #if ENABLED(Z_MULTI_ENDSTOPS)
       enabled_dual_z_stop = 1;
       #if Z_HOME_DIR > 0
@@ -1177,7 +1177,7 @@ void tronxy_config_init(void)
         pin_right_z_endstop = Z_MIN_PIN;
       #endif
     #else
-      enabled_dual_z_stop = 2;//安装了探头并且不用它来作限位,则表示用限位开关限位,用探头找0点
+      enabled_dual_z_stop = 2;//If the probe is installed and not used as a limit, it means that the limit switch is used to limit the position and the probe is used to find the 0 point.
       #if Z_HOME_DIR > 0
       enabled_z_max_home = 1;
       pin_right_z_endstop = Z_MAX_PIN;

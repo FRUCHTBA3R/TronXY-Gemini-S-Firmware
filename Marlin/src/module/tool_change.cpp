@@ -1172,7 +1172,7 @@ void tool_change(const uint8_t new_tool, bool no_move/*=false*/) {
 
     if (new_tool != old_tool || TERN0(PARKING_EXTRUDER, extruder_parked)) { // PARKING_EXTRUDER may need to attach old_tool when homing
       #if TRONXY_UI && ENABLED(DUAL_X_CARRIAGE)
-      static xyze_pos_t last_position = {-9999.9,-9999.9,-9999.9,-9999.9};//记录双头交换E前自己的位置,以便交换回来后,恢复自己的位置
+      static xyze_pos_t last_position = {-9999.9,-9999.9,-9999.9,-9999.9}; // Record your position before the double-headed exchange E so that you can restore your position after the exchange comes back.
       if(my_print_status == PRINT_RUNNING) {
         if(last_position.x == -9999.9)last_position = destination = current_position;
         else {

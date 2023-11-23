@@ -1370,7 +1370,7 @@ FORCE_INLINE void segment_idle(millis_t &next_idle_ms) {
         case DXC_MIRRORED_MODE:
         case DXC_DUPLICATION_MODE:
           if (active_extruder == 0) {
-            current_position.z += NOZZLE_PARK_Z_RAISE_MIN;//避免喷嘴刮到热床,因此打印文件第一条移动的gcode必须指定Z高度
+            current_position.z += NOZZLE_PARK_Z_RAISE_MIN; // To prevent the nozzle from scraping the hot bed, the first moving gcode of the printed file must specify the Z height.
             line_to_current_position();
             planner.synchronize();
             set_duplication_enabled(false); // Clear stale duplication state

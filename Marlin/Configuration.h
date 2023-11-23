@@ -60,7 +60,7 @@
 // @section info
 
 // Author info of this build printed to the host during boot and M115
-#define STRING_CONFIG_H_AUTHOR "(none, default config)" // Who made the changes.
+#define STRING_CONFIG_H_AUTHOR "Dr. Bogger" // Who made the changes.
 //#define CUSTOM_VERSION_FILE Version.h // Path from the root directory (no quotes)
 
 /**
@@ -3478,7 +3478,7 @@
  * Set this manually if there are extra servos needing manual control.
  * Set to 0 to turn off servo support.
  */
-#if !LASER_SERIAL //TRONXY主板舵机脚与激光引脚共用一个
+#if !LASER_SERIAL // TRONXY motherboard servo pin and laser pin share the same pin
 //#define NUM_SERVOS 3 // Note: Servo index starts with 0 for M280-M282 commands
 #endif
 

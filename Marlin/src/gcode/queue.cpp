@@ -555,12 +555,12 @@ void GCodeQueue::get_serial_commands() {
         #endif
         #if TRONXY_UI
         if(command[0] == 'M' && command[1] == '8' && command[2] == '0' && command[3] == '0')switch(command[4]) {
-          case '5'://急停
+          case '5': // emergency stop
             globalStop = true;
             stopEmergency();
             SERIAL_ECHO("M8005-0ok\n");
             return;
-          case '6'://停止电机动作
+          case '6': // Stop motor action
             globalStop = true;
             quickstop_stepper();
             // mevt.addEvt(TASK_SEQUENCE,stopMotor);
@@ -574,7 +574,7 @@ void GCodeQueue::get_serial_commands() {
         #endif
 
         // Add the command to the queue
-        #if TRONXY_UI //8200 - 8299立即执行的命令
+        #if TRONXY_UI //8200 - 8299 Commands to be executed immediately
         if(command[0] == 'M' && command[1] == '8' && command[2] == '2' && \
         command[3] >= '0' && command[3] <= '9' && \
         command[4] >= '0' && command[4] <= '9')
@@ -584,7 +584,7 @@ void GCodeQueue::get_serial_commands() {
         }
         if(ring_buffer.full()) {
           if(command[0] == 'M' && command[1] == '8' && command[2] == '4' && command[3] == '0' && command[4] == '2') {
-            //M8402不能占用额外的指令
+            //M8402 cannot occupy additional instructions
           }
           else {
             hasExtraSerialCommand = true;
@@ -625,7 +625,7 @@ void GCodeQueue::get_serial_commands() {
       const bool card_eof = card.eof();
       #if TRONXY_UI
       if (n < 0 && !card_eof) {
-        my_print_status = PRINT_PAUSE;//防止运动过程中断电,可以当成暂停来保存,在运动结束后,该状态变成idle
+        my_print_status = PRINT_PAUSE; // To prevent power outage during exercise, it can be saved as a pause. After the exercise ends, the state becomes idle.
         tronxyStop();
         mevt.addEvt(TASK_SEQUENCE,screenReadFailAfter);
         PrintJobRecovery::info.current_position = current_position;
@@ -769,7 +769,7 @@ void GCodeQueue::advance() {
 
   // The queue may be reset by a command handler or by code invoked by idle() within a handler
   #if TRONXY_UI
-  if(ring_buffer.length) //只有当length不为0时,方可递减
+  if(ring_buffer.length) //Only when length is not 0 can it be decremented
   #endif
   ring_buffer.advance_pos(ring_buffer.index_r, -1);
 }

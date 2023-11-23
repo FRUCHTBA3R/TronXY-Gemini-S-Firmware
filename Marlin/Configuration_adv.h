@@ -318,7 +318,7 @@
    * and/or decrease WATCH_TEMP_INCREASE. WATCH_TEMP_INCREASE should not be set
    * below 2.
    */
-  //YSZ-COMMENT:这里表示,在WATCH_TEMP_PERIOD秒的时间内,要增加WATCH_TEMP_INCREASE度
+  //YSZ-COMMENT:This means that within WATCH_TEMP_PERIOD seconds, increase the WATCH_TEMP_INCREASE degree
   #define WATCH_TEMP_PERIOD  40               // Seconds
   #define WATCH_TEMP_INCREASE 2               // Degrees Celsius
 #endif
@@ -734,7 +734,7 @@
   //#define CLOSED_LOOP_MOVE_COMPLETE_PIN -1
 #endif
 
-#if TRONXY_PROJ && ENABLED(FIX_MOUNTED_PROBE) && DISABLED(Z_MIN_PROBE_USES_Z_MIN_ENDSTOP_PIN) //使用限位找Z极限点,使用探头找Z的0点
+#if TRONXY_PROJ && ENABLED(FIX_MOUNTED_PROBE) && DISABLED(Z_MIN_PROBE_USES_Z_MIN_ENDSTOP_PIN) //Use the limit to find the Z limit point and use the probe to find the 0 point of Z
 #define USE_Z_LIMIT_PROBE_0    1
 #endif
 

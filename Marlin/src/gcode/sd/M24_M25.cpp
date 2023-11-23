@@ -75,7 +75,7 @@ void GcodeSuite::M24() {
     #if TRONXY_UI
     my_print_status = PRINT_RUNNING;
     if(enabled_taoli)WRITE(pin_air,TAOLI_AIR_OPEN);
-    if(!globalStop)PrintJobRecovery::clearInterruptSign(/*true*/);//因为有可能在前面会断电中断,所以,到这里要判断是否断电中断后置globalStop为true
+    if(!globalStop)PrintJobRecovery::clearInterruptSign(/*true*/); // Because it is possible that there will be a power outage beforehand, so here you have to determine whether there is a power outage and then set globalStop to true.
     #endif
     TERN_(POWER_LOSS_RECOVERY, recovery.prepare());
   }

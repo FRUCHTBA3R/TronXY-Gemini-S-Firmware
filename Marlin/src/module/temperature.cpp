@@ -404,7 +404,7 @@ PGMSTR(str_t_heating_failed, STR_T_HEATING_FAILED);
 
     #if ENABLED(DUAL_X_CARRIAGE)
       if(idex_is_duplicating())
-      { //双头镜像和复制模式下,两边模型风扇会同时开启和关闭
+      { // In dual-head mirroring and copying modes, the fans on both sides of the model will be turned on and off at the same time.
         if(fan < THROAT_FAN)for(uint8_t i = 0; i < THROAT_FAN; i++)fan_speed[i] = speed;
         else {
             constexpr int fan_num = THROAT_FAN + HOTENDS;
@@ -3425,7 +3425,7 @@ void Temperature::isr() {
   #if LASER_SAFETY_TIMEOUT_MS > 0
     if (
       #if TRONXY_UI
-      (enabled_laser_serial != 2) && //在手动开激光的前提下,不用执行超安全时间关激光的功能
+      (enabled_laser_serial != 2) && // On the premise of manually turning on the laser, there is no need to perform the function of turning off the laser at the ultra-safe time
       #endif
       cutter.last_power_applied && ELAPSED(millis(), gcode.previous_move_ms + (LASER_SAFETY_TIMEOUT_MS))) {
       cutter.power = 0;       // Prevent planner idle from re-enabling power

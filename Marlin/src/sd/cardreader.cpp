@@ -498,7 +498,7 @@ void CardReader::manage_media() {
   if(myui_ready < 2 || my_print_status == PRINT_ERROR)return;
   static bool first = true;
   if(first) {
-    if(PrintJobRecovery::exists()) { //因为有可能有多个打印设备源(SD卡,USB),所以,先load出设备号
+    if(PrintJobRecovery::exists()) { // Because there may be multiple printing device sources (SD card, USB), so load the device number first
       PrintJobRecovery::load(); 
       xy_device_id = PrintJobRecovery::info.deviceId;
     }
@@ -539,7 +539,7 @@ void CardReader::manage_media() {
   prev_stat = stat;                 // Change now to prevent re-entry in safe_delay
 
   if (stat) {                       // Media Inserted
-    #if !TRONXY_UI //这里不需要延时
+    #if !TRONXY_UI // No need for delay here
       safe_delay(500);                // Some boards need a delay to get settled
     #endif
     // Try to mount the media (only later with SD_IGNORE_AT_STARTUP)
@@ -568,7 +568,7 @@ void CardReader::manage_media() {
 
   // Check for PLR file.
   #if TRONXY_UI && ENABLED(POWER_LOSS_RECOVERY)
-    if(recovery.valid()) { //因为上面已经load过了
+    if(recovery.valid()) { //Because it has been loaded above
       do_auto = false;
       queue.inject_P(PSTR("M1000S"));
     }
