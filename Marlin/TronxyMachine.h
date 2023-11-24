@@ -21,7 +21,7 @@
 
 #define TRONXY_MACHINE_NAME       "GeminiS"
 #define TRONXY_BACKUP_POWER       0 //UPS function, please note that certain pins are required for power failure detection and configure the corresponding interrupt function.
-#define TRONXY_SCREEN_SHUTDOWN    0 //Screen off function
+#define TRONXY_SCREEN_SHUTDOWN    1 //Screen off function
 #define TRONXY_HOME_XY_ONLY       0 //Is the manual debugging interface reset only XY reset? If so, the Z reset button is activated, otherwise it is invalid.
 #define WIFI_INTERFACE            0 //WIFI function
 #define TAOLI_SERIAL              0
