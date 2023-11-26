@@ -60,7 +60,7 @@
 // @section info
 
 // Author info of this build printed to the host during boot and M115
-#define STRING_CONFIG_H_AUTHOR "Dr. Bogger" // Who made the changes.
+#define STRING_CONFIG_H_AUTHOR "Spa Electronics" // Who made the changes.
 //#define CUSTOM_VERSION_FILE Version.h // Path from the root directory (no quotes)
 
 /**
@@ -1193,7 +1193,8 @@
  * Override with M92
  *                                      X, Y, Z [, I [, J [, K...]]], E0 [, E1[, E2...]]
  */
-#define DEFAULT_AXIS_STEPS_PER_UNIT   { 160.0, 160.0, 800.0, 766.22 }
+//#define DEFAULT_AXIS_STEPS_PER_UNIT   { 160.0, 160.0, 800.0, 766.22 }   // Orignal Value
+#define DEFAULT_AXIS_STEPS_PER_UNIT   { 160.0, 160.0, 800.0, 798.15 }     // Changed for Gemini S
 
 /**
  * Default Max Feed Rate (linear=mm/s, rotational=°/s)
@@ -3313,7 +3314,7 @@
   #define BUTTON_DELAY_EDIT  50 // (ms) Button repeat delay for edit screens
   #define BUTTON_DELAY_MENU 250 // (ms) Button repeat delay for menus
 
-  //#define TOUCH_IDLE_SLEEP 300 // (s) Turn off the TFT backlight if set (5mn)
+  #define TOUCH_IDLE_SLEEP 300 // (s) Turn off the TFT backlight if set (5mn)
   #if !TRONXY_UI
   #define TOUCH_SCREEN_CALIBRATION
   #endif
