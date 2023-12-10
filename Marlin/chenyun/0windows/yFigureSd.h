@@ -2,7 +2,7 @@
 
 #include "yFigure.hpp"
 #include "yPicture.hpp"
-#define ALIGN_CONTENT_LENGTH  9 //1换行符,M10086 ;8个对齐字符
+#define ALIGN_CONTENT_LENGTH  9 //1 newline character, M10086; 8 alignment characters
 class yFigureSd : public yFigure
 {
     public:
@@ -10,8 +10,8 @@ class yFigureSd : public yFigure
 		yWidget(xStart,yStart,width,height,idle_attr,focus_attr)
         {
             sdfileName = nullptr;
-            picSign = nullptr; //图标识
-            picOffsetFromFile = 0; //图信息在SD文件中的位置(可以快速找到图片)
+            picSign = nullptr; //Figure identification
+            picOffsetFromFile = 0; //The location of the picture information in the SD file (you can quickly find the picture)
             picXOffset = 0;
             picYOffset = 0;
         }
@@ -24,7 +24,7 @@ class yFigureSd : public yFigure
         void setSdpicInfo(const char* name,const char*sign, uint32_t offset, int width, int height);
         void clearSdpicInfo();
         inline void setSdpicOffset(int x,int y) {picXOffset = x; picYOffset = y;}
-        //检测是否有sdpic,如果有,返回其图像偏移量,当返回0xFFFFFFFE时,文件打不开,返回0xFFFFFFFF时,没有sdpic
+        //Detect whether there is an sdpic. If so, return its image offset. When 0xFFFFFFFE is returned, the file cannot be opened. When 0xFFFFFFFF is returned, there is no sdpic.
         static uint32_t sdpicCheck(const char*fname,const char* sign,uint32_t picOffset);
         static void exeSdpic(const char*fname,int xsize,int ysize, uint32_t& foffset, void (*)(const void*,int));
     private:

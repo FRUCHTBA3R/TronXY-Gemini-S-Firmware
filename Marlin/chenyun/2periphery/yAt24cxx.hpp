@@ -1,7 +1,7 @@
 #pragma once
 
 #include "yCommon.h"
-//底层需要提供以下接口
+//The bottom layer needs to provide the following interfaces
 void at24iicInit(void);
 void at24iicStart(void);
 void at24iicStop(void);

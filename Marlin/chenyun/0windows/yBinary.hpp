@@ -14,18 +14,18 @@ class yBinary : virtual public yWidget
 		color_t binFrStart,binFrEnd,binBg;
 		int binX,binY;
 		const PicAttr *binAttr;
-		void showED8b( //显示外存二位图,返回x末点位置
-			int xStart,int yStart,int xEnd,int yEnd,//可视范围(字形范围与VisualRect的交集)
-			uint32_t eAddr, //二元色码外部FLASH地址
-			int distance = 1);//下一个二元图间距
-		void getPureED8bScale(int& xStart,int& xEnd,uint32_t eAddr);//这里的eaddr不一定是binAttr->value,显示字符的时候,它应该是字符字模地址
-		void showID8b(//显示内存二位图,返回x末点位置
-			int xStart,int yStart,int xEnd,int yEnd,//可视范围(字形范围与VisualRect的交集)
-			const uint8_t *idat,//二元色内部FLASH地址
-			int distance = 1);//下一个二元图间距
+		void showED8b( //Display the external two-bit image and return the end point position of x
+			int xStart,int yStart,int xEnd,int yEnd,//Visual range (the intersection of glyph range and VisualRect)
+			uint32_t eAddr, //Binary color code external FLASH address
+			int distance = 1);//Next bigram spacing
+		void getPureED8bScale(int& xStart,int& xEnd,uint32_t eAddr);//The eaddr here is not necessarily binAttr->value. When displaying characters, it should be the character font address.
+		void showID8b(//Display the memory two-bit map and return the end point position of x
+			int xStart,int yStart,int xEnd,int yEnd,//Visual range (the intersection of glyph range and VisualRect)
+			const uint8_t *idat,//Binary color internal FLASH address
+			int distance = 1);//Next bigram spacing
 		void getPureID8bScale(int& xStart,int& xEnd,const uint8_t* idat);
-		void horizonIBinary();//显示水平类二元图
-		void verticalIBinary();//显示垂直类二元图
+		void horizonIBinary();//Display horizontal class bivariate diagram
+		void verticalIBinary();//Display vertical class binary diagram
 };
 
 class ySimulation : virtual public yBinary
@@ -36,7 +36,7 @@ class ySimulation : virtual public yBinary
 		inline virtual uint8_t update(uint8_t force = 0)
 		{
 			if(yWidget::update(force))return 1;
-			if(!focus || focusAllUpdate)updateSimulation(force);//分开是为了继承者灵活调用
+			if(!focus || focusAllUpdate)updateSimulation(force);//Separation is for flexible calling by successors
 			return 0;
 		}
 		inline virtual void show(uint8_t force = 0) {

@@ -21,34 +21,34 @@ class yWidget
 
 	protected:
 		uint8_t focus;
-		uint8_t focusAllUpdate;//默认为1
-		//置0后,调用setfocus时,只更新widget,不更新继承部件,主要针对按下控件加透明色的控件
-		//抬起时,会更新全部
+		uint8_t focusAllUpdate;//Default is 1
+		//After setting it to 0, when calling setfocus, only the widget will be updated, and the inherited components will not be updated. This is mainly for controls that add transparent color when the control is pressed.
+		//When lifted, all will be updated
 		const ScaleAttr* scaAttrIdle,*scaAttrFocus,*scaAttr;
-		int wXStart,wYStart,wXEnd,wYEnd;//本控件范围
+		int wXStart,wYStart,wXEnd,wYEnd;//The scope of this control
 
 	public:
 		union {
 			struct {
 				int scale:1;
 				int simulation:1;
-				int picture:1;//第一次不显示,一般用在需要第一次刷背景,第二次显示文本的情况
+				int picture:1;//Not displayed for the first time, generally used when you need to brush the background for the first time and display the text for the second time.
 				int text:1;
 				int other:4;
-			}content;//这里标记update绘制哪些部分,见宏定义
+			}content;//Mark here which parts of the update are drawn, see macro definition
 			uint8_t all;
 		}sign;
 		uint8_t colorVertical;
-		uint8_t touchChoose;//0:不响应触摸,1一旦触摸,无论是否触到本控件,都必然响应,2,只有触摸到本控件才响应
+		uint8_t touchChoose;//0:Does not respond to touch. 1. Once touched, it will respond regardless of whether it touches this control. 2. It will only respond if this control is touched.
 		uint8_t funParam;
-		static WRECT VisualRect;//可见区域
-		virtual uint8_t update(uint8_t force = 0);//刷新界面,返回true表示该控件可视区域无显示
+		static WRECT VisualRect;//visible area
+		virtual uint8_t update(uint8_t force = 0);//Refresh the interface and return true to indicate that the visible area of ​​the control is not displayed.
 		inline virtual void show(uint8_t force = 0) {
 			update(force);
 			sign.content.scale = 0;
 		}
-		void (*fun)(yWidget*w,TouchEvent evt);//发生触控事件后,会立即调用本函数
-		uint8_t (*funNext)();//发生触控后,调用fun后,在外面调用本函数,可能会释放本控件
+		void (*fun)(yWidget*w,TouchEvent evt);//This function will be called immediately after a touch event occurs
+		uint8_t (*funNext)();//After a touch occurs, after calling fun, calling this function outside may release this control.
 		inline virtual void setfocus(uint8_t tf) {
 			if(tf && !focus) {
 				focus = 1;
@@ -64,7 +64,7 @@ class yWidget
 		inline void disableFocusAllUpdate(bool en){if(en)focusAllUpdate = 0;else focusAllUpdate = 1;}
 		inline virtual uint8_t enUpdate(void) { return !!scaAttr && sign.content.scale == 0; }
 		void setRectOffset(int x,int y);
-		//求wgRect与VisualRect求交集
+		//Find the intersection of wgRect and VisualRect
 		inline uint8_t boundIntersect(int& xStart,int& yStart,int& xEnd,int& yEnd)
 		{
 			xStart = yMAX(wXStart, VisualRect.xStart);
@@ -79,7 +79,7 @@ class yWidget
 
 	protected:
 		inline void horizontalLine(color_t color,int xStart,int xEnd,int y)
-			{//在屏幕上绘制一条横线
+			{//Draw a horizontal line on the screen
 				if(y < wYStart || y < VisualRect.yStart || y > wYEnd || y > VisualRect.yEnd)return;
 				if(xStart < wXStart)xStart = wXStart;
 				if(xStart < VisualRect.xStart)xStart = VisualRect.xStart;
@@ -87,7 +87,7 @@ class yWidget
 				if(xEnd > VisualRect.xEnd)xEnd = VisualRect.xEnd;
 				if(xStart > xEnd)return;
 				while(LCD_Busy()){}
-				LCD_LBuffer2[0] = color;//必须使用全局变量保存颜色,否则函数返回后,color释放掉了,DMA在传输的这个颜色就不准了
+				LCD_LBuffer2[0] = color;//You must use global variables to save the color. Otherwise, the color will be released after the function returns, and the color transferred by DMA will not be accurate.
 				HORIZONTAL_LINE(y,xStart,xEnd);
 			}
 		inline void verticalLine(color_t color,int x,int yStart,int yEnd)
@@ -99,7 +99,7 @@ class yWidget
 				if(yEnd > VisualRect.yEnd)yEnd = VisualRect.yEnd;
 				if(yStart > yEnd)return;
 				while(LCD_Busy()){}
-				LCD_LBuffer2[0] = color;//必须使用全局变量保存颜色,否则函数返回后,color释放掉了,DMA在传输的这个颜色就不准了
+				LCD_LBuffer2[0] = color;//You must use global variables to save the color. Otherwise, the color will be released after the function returns, and the color transferred by DMA will not be accurate.
 				VERTICAL_LINE(x,yStart,yEnd);
 			}
 		inline void frame(color_t color,int xStart,int yStart,int xEnd,int yEnd) {
@@ -111,10 +111,10 @@ class yWidget
 		void rect(color_t color,int xStart,int yStart,int xEnd,int yEnd);
 		void horizonRect(color_t color_start,color_t color_end);
 		void verticalRect(color_t color_start,color_t color_end);
-		void line(color_t color,int xStart,int yStart,int xEnd,int yEnd);//画线
+		void line(color_t color,int xStart,int yStart,int xEnd,int yEnd);//draw line
 
 	protected:
-		//将x,y围与VisualRect求交集
+		//Find the intersection of x, y and VisualRect
 		static inline uint8_t boundIntersect2(int& xStart,int& yStart,int& xEnd,int& yEnd)
 		{
 			if(xStart < VisualRect.xStart)xStart = VisualRect.xStart;
@@ -123,7 +123,7 @@ class yWidget
 			if(yEnd > VisualRect.yEnd)yEnd = VisualRect.yEnd;
 			return (xEnd < xStart || yStart > yEnd);
 		}
-		//将x,y围与wgRect和VisualRect三方求交集
+		//Find the intersection of x and y with wgRect and VisualRect
 		inline uint8_t boundIntersect3(int* xStart,int* yStart,int* xEnd,int* yEnd)
 		{
 			if(wXStart < VisualRect.xStart)

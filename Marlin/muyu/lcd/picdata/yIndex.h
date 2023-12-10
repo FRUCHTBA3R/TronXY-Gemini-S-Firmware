@@ -163,7 +163,7 @@ extern const uint16_t tip_dualz_limit_cn[];
 
 #define LOG_EROM_ADDR        0x00000000
 #if TRONXY_UI == UI_PIC480X320
-//pic_index第一个值
+//pic_index first value
 #define UI_EROM_ADDR         0x00040000
 //UI:0x00040000 -- 0x00151000
 #define FONTU16_EROM_ADDR    0x00151000

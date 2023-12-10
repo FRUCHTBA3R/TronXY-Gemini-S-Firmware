@@ -10,24 +10,24 @@ typedef struct __attribute__((__packed__)) {
 
 class yWindow {
 	public:
-		//注意,这里会改变控件的位置,所以,在控件有边界判断(如addChars)这种操作时,需要在最后调用yWindow
+		//Note that the position of the control will be changed here. Therefore, when the control has boundary judgment (such as addChars), you need to call yWindow at the end.
 		yWindow(int x, int y, int width, int height, yWidget *components[], int componentsNum, yWindow* parent = nullptr);
 		~yWindow();
 
 		yWindow* Parent;
-		void refreshComponents();//刷新本窗口
-		void update();//刷新窗口(包括父窗口)
+		void refreshComponents();//Refresh this window
+		void update();//Refresh windows (including parent windows)
 
 		uint8_t needFresh();
-		void clrUpdateSign();//当绘制一次窗口后,清除所有需绘标记,等待其它应用标相应标记后再重绘,必须有顶端窗口指针执行
+		void clrUpdateSign();//After drawing the window once, clear all the marks that need to be drawn, wait for other applications to mark the corresponding marks before redrawing, and the top window pointer must be executed.
 		void setUpdateSign();
 		void move(int x,int y);
 		yWidget* getComponent(int index){if(index < ComponentNum)return Components[index];return nullptr;}
 		int touchDelay;
 		static Touch_t para_calibration;
 		uint8_t touch(int &x, int &y, uint8_t ifExecute);
-		int continueTouchTimes(int dis = 200);//检测屏幕被连续点击(两次点击时间小于dis ms)的次数,正在点击中返回负数,没有点击,返回0,点击完成返回点击的次数
-		uint8_t hasStopContinueTouch(int dis = 1000);//停止了连续点击
+		int continueTouchTimes(int dis = 200);//Detects the number of consecutive clicks on the screen (the time between two clicks is less than dis ms), returns a negative number during the click, returns 0 when there is no click, and returns the number of clicks after the click is completed.
+		uint8_t hasStopContinueTouch(int dis = 1000);//Stopped continuous clicking
 		inline void touchReset(void) {
 			touchStep = 0;
 			touchDelay = -1;

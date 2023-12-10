@@ -921,7 +921,7 @@ void kill(FSTR_P const lcd_error/*=nullptr*/, FSTR_P const lcd_component/*=nullp
   #if TRONXY_UI
     if(my_print_status == PRINT_ERROR) {
       thermalManager.disable_all_heaters();
-      return;//防止重复报错
+      return;//Prevent repeated errors
     }
     hal.watchdog_refresh();
     screenKillError(lcd_error,lcd_component);
@@ -995,7 +995,7 @@ void minkill(const bool steppers_off/*=false*/) {
       sei();
       if(Buzzer::buffer.isEmpty())buzzer.tone(200,800);
       hal.watchdog_refresh();
-      while(buzzer.buffer.count())buzzer.tick();//等待蜂鸣器结束
+      while(buzzer.buffer.count())buzzer.tick();//Wait for the buzzer to end
       while(buzzer.state.endtime)buzzer.tick();
       delay(500);
       NVIC_SystemReset();

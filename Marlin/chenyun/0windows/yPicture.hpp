@@ -27,7 +27,7 @@ class yPicture : virtual public yWidget
 		inline virtual uint8_t update(uint8_t force = 0)
 		{
 			if(yWidget::update(force))return 1;
-			if(!focus || focusAllUpdate)updatePicture(force);//分开写是为继承者灵活调用
+			if(!focus || focusAllUpdate)updatePicture(force);//Written separately is for flexible calling by successors.
 			return 0;
 		}
 		inline virtual void show(uint8_t force = 0) {
@@ -62,8 +62,8 @@ class yPicture : virtual public yWidget
 		int picOffsetX,picOffsetY;
 		const PicAttr *picAttr,*picAttrIdle,*picAttrFocus;
 		void updatePicture(uint8_t force);
-		void showEBytes(int x,int y);//显示外部ROM中的字节图像-图像数据以字节形式保存
-		void showLineCompress(int x,int y);//显示外部ROM中压缩图形,行
-		void showTotalCompress(int x,int y);//显示外部ROM中压缩图形,整(<=32x32)
-		void showIBytes(int x,int y);//显示IFLASH中的字节图像-图像数据以字节形式保存
+		void showEBytes(int x,int y);//Display byte image from external ROM - image data is saved in byte form
+		void showLineCompress(int x,int y);//Display compressed graphics in external ROM, line
+		void showTotalCompress(int x,int y);//Display compressed graphics in external ROM, whole (<=32x32)
+		void showIBytes(int x,int y);//Display byte image in IFLASH - image data is saved in byte form
 };

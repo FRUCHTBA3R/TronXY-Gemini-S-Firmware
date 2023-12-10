@@ -1738,7 +1738,7 @@ void Planner::endstop_triggered(const AxisEnum axis) {
     buzzer_switch && 
     #endif
     Buzzer::buffer.isEmpty())
-    buzzer.tone(200,800);//这里在触碰限位开关时会多次调用,它本身会调用idle(),由于本函数是在stepper.isr中数函数中进行,所以,不能等待,需判空再执行tone
+    buzzer.tone(200,800);//This will be called multiple times when the limit switch is touched. It will call idle() itself. Since this function is performed in the stepper.isr middle function, it cannot wait. It needs to be empty before executing tone.
   // Record stepper position and discard the current block
   stepper.endstop_triggered(axis);
 }

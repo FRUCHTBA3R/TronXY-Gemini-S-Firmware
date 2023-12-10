@@ -23,12 +23,12 @@ class yCircleButton : public yMultiple
             sign.content.simulation = 0;
             sign.content.text = 0;
         }
-        int circleX,circleY; //圆心坐标
-        int circleR;//圆半径
-        int circleDis;//圆周厚度
+        int circleX,circleY; //Circle center coordinates
+        int circleR;//circle radius
+        int circleDis;//Circumferential thickness
     private:
-		void midCircle(color_t color,int r,int x,int y,int dis = 1);//画圆:圆心x,y,半径r,圆边厚度dis
-		void pollCircle(color_t color_start,color_t color_end,int r,int dis,int xStart,int yStart,int xEnd,int yEnd);//画圆:半径r,厚度dis
+		void midCircle(color_t color,int r,int x,int y,int dis = 1);//Draw a circle: center x, y, radius r, edge thickness dis
+		void pollCircle(color_t color_start,color_t color_end,int r,int dis,int xStart,int yStart,int xEnd,int yEnd);//Draw a circle: radius r, thickness dis
 };
 
 class yRoundedBase : virtual public yWidget
@@ -47,13 +47,13 @@ class yRoundedBase : virtual public yWidget
         int rounded_r;
 };
 
-class yRoundedSimulation : virtual public yFigure,virtual public yRoundedBase //圆角矩形按钮
+class yRoundedSimulation : virtual public yFigure,virtual public yRoundedBase //Rounded rectangle button
 {
     public:
         yRoundedSimulation(int xStart = 0,int yStart = 0,int width = 0,int height = 0,const ScaleAttr* idle_attr = nullptr,const ScaleAttr* focus_attr = nullptr) :
         yWidget(xStart,yStart,width,height,idle_attr,focus_attr){}
         virtual ~yRoundedSimulation(){}
-        virtual uint8_t update(uint8_t force);//层级:圆角->文字(或多图)
+        virtual uint8_t update(uint8_t force);//Level: rounded corners -> text (or multiple images)
 };
 
 class yRoundedPicture : virtual public yIcon, virtual public yRoundedBase
@@ -62,5 +62,5 @@ class yRoundedPicture : virtual public yIcon, virtual public yRoundedBase
         yRoundedPicture(int xStart = 0,int yStart = 0,int width = 0,int height = 0,const ScaleAttr* idle_attr = nullptr,const ScaleAttr* focus_attr = nullptr) :
         yWidget(xStart,yStart,width,height,idle_attr,focus_attr){}
         virtual ~yRoundedPicture(){}
-        virtual uint8_t update(uint8_t force);//层级:圆角->图片->文字
+        virtual uint8_t update(uint8_t force);//Level: rounded corners->image->text
 };

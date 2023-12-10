@@ -41,8 +41,8 @@ inline void intToBuff(unsigned int f, void *dst, unsigned int bytes)
 			return;
 	}
 }
-unsigned int yDecompressSize(const void *source);//从压缩后的文件流中读取到解压该文件后产生的数据大�?
-unsigned int yCompressSize(const void *source);//从压缩后的文件流中读取到压缩的数据大�?(不是文件本身大小)
+unsigned int yDecompressSize(const void *source);//Read from the compressed file stream to the large amount of data generated after decompressing the file.
+unsigned int yCompressSize(const void *source);//Read the compressed data size from the compressed file stream (not the size of the file itself)
 int yCompress(const void *source, void *destination, unsigned int totalSize,const unsigned short sector);
 unsigned int yDecompress(const void *source, void *destination);
 unsigned int _decompress(const void *source, int sorceLen, void *destination,int decompressSize);

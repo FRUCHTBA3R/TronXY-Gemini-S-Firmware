@@ -131,11 +131,11 @@ extern uint8_t my_test,myui_ready;
 extern volatile uint8_t model_light_st;
 extern uint8_t extruder_num,
 	hotend_num,
-	out_extruder,//记录断料的挤出机
-	throat_fan,//为0表示不使用喉管风扇,其它值代表喉管风扇在风扇列表中的起始位置
+	out_extruder,//Extruder recording material breakage
+	throat_fan,//A value of 0 indicates that the duct fan is not used, and other values ​​represent the starting position of the duct fan in the fan list.
 	fifth_mode,
-	dir_y_axis,//影响y轴图标形为,如果图标点击后移动方向是反的,则倒转此值
-	dir_z_axis,//影响热床Z上下图标形为,如果图标点击后移动方向是反的,则倒转此值
+	dir_y_axis,//Affects the shape of the y-axis chart. If the movement direction of the icon is reversed after clicking, this value will be inverted.
+	dir_z_axis,//The Z up and down icon shape that affects the heating bed is. If the moving direction is reversed after clicking on the icon, this value will be inverted.
 	xy_device_id;
 
 extern uint8_t pin_left_z_endstop, 
@@ -161,7 +161,7 @@ extern volatile uint8_t enabled_laser_serial,
 	enabled_need_heat_head,
 	enabled_need_heat_bed,
 	enabled_fan,
-	enabled_light, //使能照明灯,用主板风扇口,必须失能USE_CONTROLLER_FAN
+	enabled_light, //To enable the lighting, use the motherboard fan port, which must be disabled USE_CONTROLLER_FAN
 	enabled_only_home_xy,
 	enabled_usb,
 	enabled_wifi;
@@ -194,7 +194,7 @@ int FSTR_P_len(FSTR_P t);
 #define TASK_LOOP                     1
 #define LOOPEVT_BASE                  0
 #define LOOPEVT_POPUP                 1
-#define LOOPEVT_UI_UPDATE             2 //UI更新优先级低于数值更新,这里如果更改,一定要记得改registerTask处作对应
+#define LOOPEVT_UI_UPDATE             2 //The priority of UI update is lower than that of numerical update. If there is a change here, be sure to remember to change the registerTask accordingly.
 #define LOOPEVT_AFTER_UI_UPDATE       3
 extern yEvent yevt,mevt;
 
@@ -256,45 +256,45 @@ extern yEvent yevt,mevt;
 enum TronxyPrintStatus
 {
 	PRINT_IDLE = 0,
-	PRINT_AUTO_LEVEL,//在自动调平中
+	PRINT_AUTO_LEVEL,//in automatic leveling
 	PRINT_ERROR,
 
-	PRINT_RUNNING,//打印中
-	PRINT_RUNNING_HOME,//打印中复位
-	PRINT_PAUSE,//暂停
-	PRINT_RESUME,//恢复中
-	PRINT_ABORTING,//打印退出中
+	PRINT_RUNNING,//Printing
+	PRINT_RUNNING_HOME,//Reset during printing
+	PRINT_PAUSE,//pause
+	PRINT_RESUME,//Recovering
+	PRINT_ABORTING,//Printing exiting
 
-	PRINT_RUNNING_SERIAL,//连机打印
+	PRINT_RUNNING_SERIAL,//On-line printing
 	PRINT_PAUSE_SERIAL,
 };
 extern volatile TronxyPrintStatus my_print_status;
 
 struct ButtonParam
 {
-	uint8_t reserve;//对齐保留
-	uint8_t paramNumber; //按钮编号
+	uint8_t reserve;//Alignment preserved
+	uint8_t paramNumber; //button number
 	#if TRONXY_UI == UI_PIC480X320
 	const uint16_t* nameCn;
 	#else
-	uint16_t nameCn; //按钮名字-多国语言
+	uint16_t nameCn; //Button name-multiple languages
 	#endif
-	const char* nameEn; //按钮名字-英语,如果为nullptr,则显示多国语言
-	void (*touch)(yWidget*,TouchEvent);//触发按钮时要执行的动作
-	yEventFun next;//触发按钮后,要执行的具体事情
+	const char* nameEn; //Button name - English, if nullptr, multiple languages ​​will be displayed
+	void (*touch)(yWidget*,TouchEvent);//The action to perform when the button is triggered
+	yEventFun next;//Specific things to be executed after the button is triggered
 };
 struct MessageSt
 {
-	uint8_t currentIndex;//功能号
-	uint8_t buttonNum;//按钮数量,最大不超过4个
+	uint8_t currentIndex;//function number
+	uint8_t buttonNum;//Number of buttons, maximum no more than 4
 	#if TRONXY_UI == UI_PIC480X320
 	const uint16_t* cn;
 	#else
-	uint16_t cn; //界面信息-多国语言
+	uint16_t cn; //Interface information-multiple languages
 	#endif
-	const char* en; //界面信息,如果为nullptr,则显示多国语言
-	yEventFun after;//执行弹窗后,要执行的动作
-	ButtonParam buttonParam[4];//按钮参数
+	const char* en; //Interface information, if it is nullptr, multiple languages ​​will be displayed.
+	yEventFun after;//Actions to be performed after executing the pop-up window
+	ButtonParam buttonParam[4];//button parameters
 };
 extern struct MessageSt messageSt;
 

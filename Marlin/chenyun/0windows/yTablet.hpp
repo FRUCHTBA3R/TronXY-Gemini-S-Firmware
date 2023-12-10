@@ -27,18 +27,18 @@ class yTablet : virtual public yWords
 		}
 
 		inline virtual uint8_t enUpdate(void) {return yWidget::enUpdate() || (Pad && sign.content.text == 0);}
-		void addChars(const char*str);//向Notepad加入字符串
+		void addChars(const char*str);//Add string to Notepad
 		void addChars(const uint16_t*tar);
 		void setBuffSpace(int row,int column);
-		int margin;//文字离边界距离
+		int margin;//text distance from border
 
 	private:
-		uint8_t Column,Row;//一共有多少列多少行
-		uint8_t curRow,curColumn;//光标位置:所在行和列
-		int curXPixel;//光标列像素位置(用以计算是否越边界)
+		uint8_t Column,Row;//How many columns and rows are there in total?
+		uint8_t curRow,curColumn;//Cursor position: row and column
+		int curXPixel;//Cursor column pixel position (used to calculate whether it crosses the boundary)
 		TPAD *Pad;
 		void freePad();
-		void allocPad();//此函数应该在设置utf16是否为true后调用
-		void lineFeed();//换行
+		void allocPad();//This function should be called after setting whether utf16 is true
+		void lineFeed();//newline
 };
 

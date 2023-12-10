@@ -25,6 +25,6 @@ class yVariant : virtual public yWords
 			yWords::pureSetFocus(tf);
 		}
 
-		uint8_t fixedEdge;//1-当colorVertical为true时上边,否则左边固定;0-当colorVertical为true时,下边,否则右边固定;
-		void changeBorder(int v);//fixedEdge决定固定边,这里变化的是与之对应的可变的边
+		uint8_t fixedEdge;//1-When colorVertical is true, the upper side, otherwise the left side is fixed; 0-when colorVertical is true, the lower side, otherwise the right side is fixed;
+		void changeBorder(int v);//fixedEdge determines the fixed edge, what changes here is the corresponding variable edge
 };

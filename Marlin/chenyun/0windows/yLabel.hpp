@@ -25,22 +25,22 @@ class yWords : virtual public yBinary
 		}
 		uint8_t wordsOpaque;
 		uint8_t _fillMargin;
-		uint8_t wxCenter; //文字X自动居中
-		uint8_t textDistance;//必须在addChars等函数之前,因为它们会用到这个值
-		uint8_t representChar;//如果这里被赋非0值,则显示字符时,只显示本变量,不显示真实的字符,常用于密码显示
-		static uint16_t uw_start_addr;//显示国际语言起点地址
-		//如果全部显示,则为0
-		//如果只显示某种语言,则起始地址为该语言第一个字符在unicode中的位置
-		//例如只显示中文则为0x4E00,中文范围0x4E00~0x9FBB
-		int wordOffsetX,wordOffsetY;//不能直接变成wordX的原因是当窗口移动调用setRectOffset所有控件的位置都会变
-		int verticalDistance;//垂直间距
+		uint8_t wxCenter; //Text X automatically centered
+		uint8_t textDistance;//Must be before functions such as addChars, because they will use this value
+		uint8_t representChar;//If a non-zero value is assigned here, when displaying characters, only this variable will be displayed, and the real characters will not be displayed. It is often used for password display.
+		static uint16_t uw_start_addr;//Show international language start address
+		//0 if all are displayed
+		//If only a certain language is displayed, the starting address is the position of the first character of the language in unicode
+		//For example, if only Chinese is displayed, it is 0x4E00, and the Chinese range is 0x4E00~0x9FBB.
+		int wordOffsetX,wordOffsetY;//The reason why it cannot be directly changed to wordX is that when the window moves and calls setRectOffset, the positions of all controls will change.
+		int verticalDistance;//vertical spacing
 		const PicAttr *wEnPic,*wCnPic;
 		uint16_t *words;
 
 	protected:
 		color_t wordsFrIdle,wordsFrFocus,wordsBgIdle,wordsBgFocus;
 		uint16_t wordsLen;
-		int lbYStart,lbYEnd;//Y范围
+		int lbYStart,lbYEnd;//Y range
 		uint8_t putc(uint16_t c);
 		void fillMargin();
 		void updateWords(uint8_t force);

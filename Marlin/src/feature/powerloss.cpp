@@ -425,9 +425,9 @@ void PrintJobRecovery::resume() {
   #if TRONXY_UI
     #if HAS_FILAMENT_SENSOR
     bool runout_enabled = runout.enabled;
-    runout.enabled = false; //禁止断料检测
+    runout.enabled = false; //Disable material break detection
     #endif
-    current_position.z = info.current_position.z + info.zraise;//为预防在恢复过程中断电,这里必须先记录Z的真实位置
+    current_position.z = info.current_position.z + info.zraise;//In order to prevent power outage during the recovery process, the true position of Z must be recorded first.
     sync_plan_position();
     clearInterruptSign(/*true*/);
   #endif
@@ -443,9 +443,9 @@ void PrintJobRecovery::resume() {
     gcode.process_subcommands_now(F("M420 S0 Z0"));
   #endif
 
-  #if TRONXY_UI && HAS_HOTEND //喷头和热床同时加热
+  #if TRONXY_UI && HAS_HOTEND //The nozzle and heating bed are heated at the same time
     HOTEND_LOOP() {
-      if(info.target_temperature[e]) {//只有需要加热的才加热
+      if(info.target_temperature[e]) {//Only heat what needs to be heated
         const int16_t et = _MAX(info.target_temperature[e], 180);
         if (et) {
           #if HAS_MULTI_HOTEND
@@ -471,7 +471,7 @@ void PrintJobRecovery::resume() {
       #if HAS_FILAMENT_SENSOR
       runout.enabled = runout_enabled;
       #endif
-      return;//加热过程中出现异常,退出
+      return;//Abnormality occurs during heating process, exit
     }
     #endif
   #endif
@@ -496,7 +496,7 @@ void PrintJobRecovery::resume() {
       #if HAS_FILAMENT_SENSOR
       runout.enabled = runout_enabled;
       #endif
-      return;//加热过程中出现异常,退出
+      return;//Abnormality occurs during heating process, exit
     }
     #endif
   #endif
@@ -519,7 +519,7 @@ void PrintJobRecovery::resume() {
     #if Z_HOME_DIR > 0
       gcode.process_subcommands_now(F("G28R0 S0"));
       while(queue.has_commands_queued() || planner.has_blocks_queued())idle();
-      current_position.z = info.zBottomPos; //复位后的高度即为正常复位时探头到限位开关的距离,因为把探头探点当成0点
+      current_position.z = info.zBottomPos; //The height after reset is the distance from the probe to the limit switch during normal reset, because the probe point is regarded as 0 point
       sync_plan_position();
       #if !TRONXY_UI
       (void)z_raised;
@@ -558,16 +558,16 @@ void PrintJobRecovery::resume() {
         gcode.process_subcommands_now(cmd);
       #endif
       #if ENABLED(DUAL_X_CARRIAGE)
-      if (idex_is_duplicating()){//复制/镜像模式下必须要执行这里
+      if (idex_is_duplicating()){//This must be executed in copy/mirror mode
         idex_set_parked(true);
         stepper.set_directions();
       }
       #endif
-      if(info.zraise == 0.0) //如果已经抬升,说明断电之前已经回抽,这里不必再回抽
+      if(info.zraise == 0.0) //If it has risen, it means that it has been withdrawn before the power was cut off, and there is no need to withdraw again here.
       {
         unscaled_e_move(-PAUSE_PARK_RETRACT_LENGTH,PAUSE_PARK_RETRACT_FEEDRATE);
       }
-      if(info.zraise < NOZZLE_PARK_Z_RAISE_MIN) {//抬升高度小于5mm,则需要再抬升
+      if(info.zraise < NOZZLE_PARK_Z_RAISE_MIN) {//If the lifting height is less than 5mm, you need to lift it again
         current_position.z = NOZZLE_PARK_Z_RAISE_MIN + info.current_position.z;
         line_to_current_position();
         planner.synchronize();
@@ -644,7 +644,7 @@ void PrintJobRecovery::resume() {
           sprintf_P(cmd, PSTR("T%iS"), e);
           gcode.process_subcommands_now(cmd);
         #endif
-        #if TRONXY_UI //因为上面已经加热了,这里不必再等了
+        #if TRONXY_UI //Since it's already heated up there, there's no need to wait any longer here.
         sprintf_P(cmd, PSTR("M104S%i"), et);
         #else
         sprintf_P(cmd, PSTR("M109S%i"), et);
@@ -660,7 +660,7 @@ void PrintJobRecovery::resume() {
     gcode.process_subcommands_now(cmd);
   #endif
   #if TRONXY_UI && ENABLED(DUAL_X_CARRIAGE)
-  if(dual_x_carriage_mode == DXC_AUTO_PARK_MODE)idex_set_parked(false);//复位后,不用作切换动作
+  if(dual_x_carriage_mode == DXC_AUTO_PARK_MODE)idex_set_parked(false);//After reset, it will not be used for switching action.
   #endif
 
   // Restore print cooling fan speeds
@@ -756,7 +756,7 @@ void PrintJobRecovery::resume() {
     #if HAS_FILAMENT_SENSOR
     runout.enabled = runout_enabled;
     #endif
-  #else //已经在tronxy.cpp中打开了这个文件
+  #else //This file has been opened in tronxy.cpp
     char *fn = info.sd_filename;
     sprintf_P(cmd, M23_STR, fn);
     gcode.process_subcommands_now(cmd);

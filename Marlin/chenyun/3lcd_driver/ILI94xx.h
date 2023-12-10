@@ -2,26 +2,26 @@
 #if LCD_CHIP_INDEX == 1
 
 #if TRONXY_UI == UI_SIM320X480
-#define WIN_LMAX                                  320 //窗口长度,必须大于等于LCD长度,大窗口可以用在小LCD上,图片尺寸必须<=窗口尺寸
-#define WIN_WMAX                                  480 //窗口宽度,必须大于等于LCD宽度,大窗口可以用在小LCD上
+#define WIN_LMAX                                  320 //The window length must be greater than or equal to the LCD length. Large windows can be used on small LCDs. The picture size must be <= window size.
+#define WIN_WMAX                                  480 //The window width must be greater than or equal to the LCD width. Large windows can be used on small LCDs.
 #define	LCD_LMAX                                  WIN_LMAX
 #define	LCD_WMAX                                  WIN_WMAX
 #else
-#define WIN_LMAX                                  480 //窗口长度,必须大于等于LCD长度,大窗口可以用在小LCD上,图片尺寸必须<=窗口尺寸
-#define WIN_WMAX                                  320 //窗口宽度,必须大于等于LCD宽度,大窗口可以用在小LCD上
+#define WIN_LMAX                                  480 //The window length must be greater than or equal to the LCD length. Large windows can be used on small LCDs. The picture size must be <= window size.
+#define WIN_WMAX                                  320 //The window width must be greater than or equal to the LCD width. Large windows can be used on small LCDs.
 #define	LCD_LMAX                                  WIN_LMAX
 #define	LCD_WMAX                                  WIN_WMAX
 #endif
-#define	LCDDIR_INVERT_RB                          0x08	//红蓝交换
-#define	LCDDIR_HVCHANGE                           0x20	//第5位是1时为横屏
-#define	LCDDIR_REVERSE_W                          0x40	//第6位确定宽方向
-#define	LCDDIR_REVERSE_L                          0x80	//第7位确定长方向
+#define	LCDDIR_INVERT_RB                          0x08	//Red and blue exchange
+#define	LCDDIR_HVCHANGE                           0x20	//When the fifth bit is 1, it is horizontal screen
+#define	LCDDIR_REVERSE_W                          0x40	//Bit 6 determines the width direction
+#define	LCDDIR_REVERSE_L                          0x80	//Bit 7 determines the long direction
 
 void LCD_Init(unsigned char dir = LCDDIR_HVCHANGE | LCDDIR_INVERT_RB | LCDDIR_REVERSE_W | LCDDIR_REVERSE_L);
 void LCD_Driver_Init(unsigned char dir = LCDDIR_HVCHANGE | LCDDIR_INVERT_RB | LCDDIR_REVERSE_W | LCDDIR_REVERSE_L);
 void LCD_SetDir(unsigned char dir);
 
-//不同的芯片RGB组合方式可能不一样
+//Different chips may have different RGB combinations
 #define LCD_Area(xStart,yStart,xEnd,yEnd) \
 	LCD_WReg(0x2A);/*x*/\
 	LCD_WData((xStart) >> 8);\

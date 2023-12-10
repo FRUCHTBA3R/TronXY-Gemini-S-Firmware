@@ -256,7 +256,7 @@ bool load_filament(const_float_t slow_load_length/*=0*/, const_float_t fast_load
       #endif
     }
     #if TRONXY_UI
-    wait_for_user = false;//补充,以防wait_for_user一直为true
+    wait_for_user = false;//Supplement, in case wait_for_user is always true
     #endif
   }
 
@@ -474,7 +474,7 @@ bool pause_print(const_float_t retract, const xyz_pos_t &park_point, const bool 
 
   #if TRONXY_UI
     const bool stepper_was_enabled = stepper.suspend();
-    recovery.info.current_position = current_position;//保存当前位置,断电时,可以知道抬升后的高度差和原来的位置
+    recovery.info.current_position = current_position;//Save the current position. When the power is off, you can know the height difference after lifting and the original position.
     recovery.info.feedrate = feedrate_mm_s;
     #if HAS_HOTEND
       HOTEND_LOOP() recovery.info.target_temperature[e] = thermalManager.degTargetHotend(e);
@@ -486,7 +486,7 @@ bool pause_print(const_float_t retract, const xyz_pos_t &park_point, const bool 
     #endif
     my_print_status = PRINT_PAUSE;
     if(enabled_taoli)WRITE(pin_air,!TAOLI_AIR_OPEN);
-    recovery.clearInterruptSign(/*true*/);//清除原先标记,以防暂停过程中断电
+    recovery.clearInterruptSign(/*true*/);//Clear the original mark to prevent power outage during the pause process
     if(stepper_was_enabled)stepper.wake_up();
   #else
     // Save current position
@@ -663,7 +663,7 @@ void wait_for_confirmation(const bool is_reload/*=false*/, const int8_t max_beep
     idle_no_sleep();
   }
   #if TRONXY_UI
-  wait_for_user = false;//防止暂停期间停止,使得wait_for_user一直是true
+  wait_for_user = false;//Prevent stopping during pause so that wait_for_user is always true
   #endif
   #if ENABLED(DUAL_X_CARRIAGE)
     set_duplication_enabled(saved_ext_dup_mode, saved_ext);

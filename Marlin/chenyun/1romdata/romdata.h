@@ -5,8 +5,8 @@
 class Output
 {
 public:
-	uint8_t imode;//数制(十进制,),应用是通过参数传入的,被子类使用
-	uint8_t index;//标记当前Out编号,从0开始
+	uint8_t imode;//Number system (decimal,), application is passed in through parameters, used by subclasses
+	uint8_t index;//Mark the current Out number, starting from 0
 	Output();
 	virtual void send(uint8_t byte) const = 0;
 	Output& operator<<(const char*tstr)
@@ -33,10 +33,10 @@ inline Output& endl(Output& o){return o << "\r\n";}
 
 typedef enum
 {
-	NUM2 = 2,//二进制
-	NUM8 = 8,//八进制
-	NUM10 = 10,//十进制
-	NUM16 = 16 //十六进制
+	NUM2 = 2,//binary
+	NUM8 = 8,//Octal
+	NUM10 = 10,//decimal
+	NUM16 = 16 //hexadecimal
 }NUM_MODE;
 
 typedef const char* CPSTR;
@@ -45,7 +45,7 @@ typedef char* PSTR;
 namespace yString
 {
 	template<typename T>
-	int len(const T*str)//计算字符串长度
+	int len(const T*str)//Calculate string length
 	{
 		if(!str)return 0;
 		int n = 0;
@@ -54,7 +54,7 @@ namespace yString
 	}
 
 	template<typename T>
-	int cmp(const T* sce, const T* tar)//比较两字符串大小,source > target返回1,source < target返回-1,source == target返回0
+	int cmp(const T* sce, const T* tar)//Compare the sizes of two strings, source > target returns 1, source < target returns -1, source == target returns 0
 	{
 		if (!tar && !sce)return 0;
 		if (!tar)return 1;
@@ -71,7 +71,7 @@ namespace yString
 	}
 
 	template<typename T>
-	void cpy(T* tar, const T*sce, int maxlen = 0)//复制source到target中
+	void cpy(T* tar, const T*sce, int maxlen = 0)//Copy source to target
 	{
 		if(!tar)return;
 		if(!sce) {
@@ -89,7 +89,7 @@ namespace yString
 	}
 
 	template<typename T>
-	void cat(T* tar,const T*sce)//将source追加到target中
+	void cat(T* tar,const T*sce)//Append source to target
 	{
 		if(!tar || !sce)return;
 		while(*tar)tar++;
@@ -98,17 +98,17 @@ namespace yString
 	
 	void memzero(void* target,int size);
 	/*******************************************************************************
-	* 类名	：  Command		*函数:	hasElement
-	* 描述		：判断源串中是否存在独立的目标串
-				: 独立:在源串的目标串后边,当end!=0xFF时,后边只可能是空格类或'\0'或end字符
-				  当end==0xFF时可以是任何字符
-	* 参数		: sce-源串,tar-目标串
-	* 返回		:如果存在,返回目标串在源串中的位置,否则返回-1
-	* 编写者		：YSZ		编写日期:2020-03-24
+	* Class name	：  Command		*function:	hasElement
+	* describe		:   Determine whether there is an independent target string in the source string
+					:   Independent: After the target string of the source string, when end!=0xFF, it can only be followed by spaces or '\0' or end characters.
+				  	    When end==0xFF it can be any character
+	* parameter		:   sce-source string, tar-target string
+	* return		:   If it exists, return the position of the target string in the source string, otherwise return -1
+	* Writer		：  YSZ		date of writing:2020-03-24
 	*******************************************************************************/
 	int hasElement(const char* sce,const char* tar,uint8_t end = 0);
-	uint8_t startWith(const char*source,const char *target);//source以target作开头返回1,否则返回0
-	uint8_t endWith(const char *source,const char *target);//source以target作结尾返回1,否则返回0
+	uint8_t startWith(const char*source,const char *target);//Source starts with target and returns 1, otherwise returns 0
+	uint8_t endWith(const char *source,const char *target);//Source returns 1 if it ends with target, otherwise returns 0
 
 	template<typename T>
 	int alignWidth(T* str, const T*src, int srcLen, int width)
@@ -131,14 +131,14 @@ namespace yString
 		return i;
 	}
 	/*******************************************************************************
-	* 函数名		：intToStr
-	* 描述			：数字转字符串
-	*	参数	:num 源数字
-					:str 转后的字符串存放地址
-					:mode 数制
-	*	返回	:转换后的字符串长度
-	* 编写者		：YSZ
-	* 编写日期	：2019-12-28
+	* Function name		：intToStr
+	* describe			: Number to string
+	*	parameter		:num source number
+						:str The converted string storage address
+						:mode number system
+	*	return			:Converted string length
+	* Writer			：YSZ
+	* date of writing	：2019-12-28
 	*******************************************************************************/
 	template<typename T>
 	int intToStr(int num, T* str, NUM_MODE mode)
@@ -156,7 +156,7 @@ namespace yString
 			temp = -tempv;
 		}
 		else temp  = tempv;
-		for (t = temp; t; n++)t /= mode;//求出显示位数
+		for (t = temp; t; n++)t /= mode;//Find the number of display digits
 		str[n] = 0;
 		for (t = n - 1; temp > 0; t--){
 			str[t] = temp % mode;
@@ -176,22 +176,22 @@ namespace yString
 		return alignWidth(str,tstr,r,width);
 	}
 	/*******************************************************************************
-	* 函数名        ：floatToStr
-	* 描述          ：浮点数转字符串
-	* 参数          :num 源数字
-                   :str 转后的字符串存放地址
-				   :width 转后的总宽度,负数左对齐,正数右对齐
-				   :dot_num 转后的小数位数
-	* 返回          :转换后的字符串长度
-	* 编写者        ：YSZ
-	* 编写日期      ：2019-12-28
+	* Function name        ：floatToStr
+	* describe          : Convert floating point number to string
+	* parameter          :num source number
+                   :str The converted string storage address
+				   :width The total width after rotation, negative numbers are aligned to the left, positive numbers are aligned to the right
+				   :dot_num Number of decimal places after conversion
+	* return          :Converted string length
+	* Writer        ：YSZ
+	* date of writing      ：2019-12-28
 	*******************************************************************************/
 	template<typename T>
 	int floatToStr(float num, T*str,int dot_num = 2, int width = 0) {
 		uint8_t i;
 		T tstr[32];
 		int n, tv;
-		float t = 0.5;//精度四舍五入
+		float t = 0.5;//precision rounding
 		for(i = 0;i < dot_num;i ++)t /= 10;
 		if(num < 0) {
 			num -= t;
@@ -230,18 +230,18 @@ namespace yString
 	}
 
 	/*******************************************************************************
-	* 函数名		：strToInt
-	* 描述			：字符串转数字
-	*	参数	:str 源字符串
-					:mode 数制
-	*	返回	:转换后的结果
-	* 编写者		：YSZ
-	* 编写日期	：2020-01-12
+	* Function name		：strToInt
+	* describe			: Convert string to number
+	*	parameter	:str source string
+					:mode number system
+	*	return	:converted result
+	* Writer		：YSZ
+	* date of writing	：2020-01-12
 	*******************************************************************************/
 	template<typename T>
 	int strToInt(const T* str,NUM_MODE mode) {
 		int n = 0,sign = 1;
-		while(*str == ' ')str++;//跳过空格
+		while(*str == ' ')str++;//Skip spaces
 		switch(mode)
 		{
 			case NUM2:
@@ -281,18 +281,18 @@ namespace yString
 	}
 
 	/*******************************************************************************
-	* 函数名		：strToDouble
-	* 描述			：字符串转浮点数
-	*	参数	:str 源字符串
-	*	返回	:转换后的结果
-	* 编写者		：YSZ
-	* 编写日期	：2020-01-12
+	* Function name		：strToDouble
+	* describe			: String to floating point number
+	*	parameter		:str source string
+	*	return			:converted result
+	* Writer			：YSZ
+	* date of writing	：2020-01-12
 	*******************************************************************************/
 	template<typename T>
 	float strToDouble(const T* str) {
 		int sign = 1,dot = 0,pos = 1;
 		float d = 0.0;
-		while(*str && *str != '-' && (*str < '0' || *str > '9'))str++;//跳过非数字段
+		while(*str && *str != '-' && (*str < '0' || *str > '9'))str++;//Skip non-numeric fields
 		if(!*str)return 0.0;
 		if(*str == '-'){
 			sign = -1;
@@ -319,8 +319,8 @@ namespace yString
 
 extern uint32_t romdataAddr;
 void romdataUpdate(void);
-uint8_t romdataReset(uint32_t taddr,uint32_t period = 200); //失败返回0xFF
-uint8_t romdataGetOnebyte(void);//返回0xFF可能是失败了
-uint8_t romdataGetData(uint8_t *dst,int len);//失败返回0xFF
+uint8_t romdataReset(uint32_t taddr,uint32_t period = 200); //Failure return0xFF
+uint8_t romdataGetOnebyte(void);//return0xFF may be a failure
+uint8_t romdataGetData(uint8_t *dst,int len);//Failure return0xFF
 void romdataJump(uint32_t leng);
 
