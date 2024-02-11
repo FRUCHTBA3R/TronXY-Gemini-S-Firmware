@@ -23,15 +23,15 @@
 #define TRONXY_BACKUP_POWER       0 //UPS function, please note that certain pins are required for power failure detection and configure the corresponding interrupt function.
 #define TRONXY_SCREEN_SHUTDOWN    1 //Screen off function
 #define TRONXY_HOME_XY_ONLY       0 //Is the manual debugging interface reset only XY reset? If so, the Z reset button is activated, otherwise it is invalid.
-#define WIFI_INTERFACE            0 //WIFI function
+#define WIFI_INTERFACE            1 //WIFI function
 #define TAOLI_SERIAL              0
 #define LASER_SERIAL              0 //wifi terminal for laser PWM control
 #define DUAL_ZMAX_HOME            0 //Big end reset, reset in the opposite direction, then return to the forward direction to find 0 point
 #define Z_BED_MOVE                0 //Z-axis movement: hot bed
 #define EXTRUDERS                 2 //Number of extruders
-#define INVERT_E0_DIR             true //TITAN:true,true; BMG:false,true
+#define INVERT_E0_DIR             false //TITAN:true,true; BMG:false,true
 #define INVERT_E1_DIR             true
-#define USE_EXTRUDER              1 //T,B TITAN:1,BMG:2,TAOLI:3,general:4
+#define USE_EXTRUDER              2 //T,B TITAN:1,BMG:2,TAOLI:3,general:4
 // #define FIX_MOUNTED_PROBE
 
 #elif TRONXY_PROJ == PROJ_GEMINIXS
