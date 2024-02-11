@@ -69,7 +69,9 @@ void GcodeSuite::M77() {
   void GcodeSuite::M78() {
     if (parser.intval('S') == 78) {  // "M78 S78" will reset the statistics
       print_job_timer.initStats();
-      ui.reset_status();
+      #if !TRONXY_UI
+        ui.reset_status();
+      #endif
       return;
     }
 

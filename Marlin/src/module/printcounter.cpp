@@ -137,11 +137,14 @@ void PrintCounter::loadStats() {
   // Check if the EEPROM block is initialized
   uint8_t value = 0;
   persistentStore.access_start();
-  persistentStore.read_data(address, &value, sizeof(uint8_t));
+  int write_address = address;
+  persistentStore.read_data(write_address, &value, sizeof(uint8_t));
   if (value != 0x16)
     initStats();
-  else
-    persistentStore.read_data(address + sizeof(uint8_t), (uint8_t*)&data, sizeof(printStatistics));
+  else {
+    write_address = address + sizeof(uint8_t);
+    persistentStore.read_data(write_address, (uint8_t*)&data, sizeof(printStatistics));
+  }
   persistentStore.access_finish();
   loaded = true;
 
@@ -174,7 +177,8 @@ void PrintCounter::saveStats() {
 
   // Saves the struct to EEPROM
   persistentStore.access_start();
-  persistentStore.write_data(address + sizeof(uint8_t), (uint8_t*)&data, sizeof(printStatistics));
+  int write_address = address + sizeof(uint8_t);
+  persistentStore.write_data(write_address, (uint8_t*)&data, sizeof(printStatistics));
   persistentStore.access_finish();
 
   TERN_(EXTENSIBLE_UI, ExtUI::onSettingsStored(true));
