@@ -682,13 +682,13 @@
   #if ENABLED(PID_PARAMS_PER_HOTEND)
     // Specify up to one value per hotend here, according to your setup.
     // If there are fewer values, the last one applies to the remaining hotends.
-    #define DEFAULT_Kp_LIST {  22.54,  22.54 } //22.20
-    #define DEFAULT_Ki_LIST {   1.65,   1.65 } //1.08
-    #define DEFAULT_Kd_LIST { 108.83, 108.83 } //114.00
+    #define DEFAULT_Kp_LIST {  18.51,  18.51 }
+    #define DEFAULT_Ki_LIST {   1.36,   1.36 }
+    #define DEFAULT_Kd_LIST {  62.94,  62.94 }
   #else
-    #define DEFAULT_Kp  22.54
-    #define DEFAULT_Ki   1.65
-    #define DEFAULT_Kd  108.83
+    #define DEFAULT_Kp  18.51
+    #define DEFAULT_Ki   1.36
+    #define DEFAULT_Kd  62.94
   #endif
 #endif
 
@@ -1193,7 +1193,7 @@
  * Override with M92
  *                                      X, Y, Z [, I [, J [, K...]]], E0 [, E1[, E2...]]
  */
-#define DEFAULT_AXIS_STEPS_PER_UNIT   { 160.0, 160.0, 800.0, 766.22 }
+#define DEFAULT_AXIS_STEPS_PER_UNIT   { 160.0, 160.0, 800.0, 826.79 }
 
 /**
  * Default Max Feed Rate (linear=mm/s, rotational=°/s)
@@ -1213,7 +1213,7 @@
  * Override with M201
  *                                      X, Y, Z [, I [, J [, K...]]], E0 [, E1[, E2...]]
  */
-#define DEFAULT_MAX_ACCELERATION      { 500, 500, 100, 1000 }
+#define DEFAULT_MAX_ACCELERATION      { 800, 800, 100, 2000 }
 
 //#define LIMITED_MAX_ACCEL_EDITING     // Limit edit via M201 or LCD to DEFAULT_MAX_ACCELERATION * 2
 #if ENABLED(LIMITED_MAX_ACCEL_EDITING)
@@ -1229,8 +1229,8 @@
  *   M204 T    Travel Acceleration
  */
 #define DEFAULT_ACCELERATION          500    // X, Y, Z and E acceleration for printing moves
-#define DEFAULT_RETRACT_ACCELERATION  800    // E acceleration for retracts
-#define DEFAULT_TRAVEL_ACCELERATION   1000    // X, Y, Z acceleration for travel (non printing) moves
+#define DEFAULT_RETRACT_ACCELERATION  1800    // E acceleration for retracts
+#define DEFAULT_TRAVEL_ACCELERATION   800    // X, Y, Z acceleration for travel (non printing) moves
 
 /**
  * Default Jerk limits (mm/s)
@@ -1242,8 +1242,8 @@
  */
 //#define CLASSIC_JERK
 #if ENABLED(CLASSIC_JERK)
-  #define DEFAULT_XJERK  8.0 //10.0->15.0
-  #define DEFAULT_YJERK  8.0
+  #define DEFAULT_XJERK  10.0
+  #define DEFAULT_YJERK  10.0
   #define DEFAULT_ZJERK  0.4
   //#define DEFAULT_IJERK  0.3
   //#define DEFAULT_JJERK  0.3
@@ -1260,7 +1260,7 @@
   #endif
 #endif
 
-#define DEFAULT_EJERK    12.0  // May be used by Linear Advance
+#define DEFAULT_EJERK    5.0  // May be used by Linear Advance
 
 /**
  * Junction Deviation Factor
