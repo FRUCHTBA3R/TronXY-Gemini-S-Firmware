@@ -293,7 +293,14 @@ void GCodeParser::parse(char *p) {
   #endif
   string_arg = nullptr;
   while (const char param = uppercase(*p++)) {  // Get the next parameter. A NUL ends the loop
-
+    
+    // Stop when entering comment
+    // Set string_arg to allow strings starting with ';'
+    if(param == ';') {
+      if (!string_arg) string_arg = p - 1;
+      break;
+    }
+    
     // Special handling for M32 [P] !/path/to/file.g#
     // The path must be the last parameter
     if (param == '!' && is_command('M', 32)) {
@@ -360,7 +367,6 @@ void GCodeParser::parse(char *p) {
       while (*p && DECIMAL_SIGNED(*p)) p++;     // Skip over the value section of a parameter
       while (*p == ' ') p++;                    // Skip over all spaces
     }
-    if(*p == ';')break;
   }
 }
 
