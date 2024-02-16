@@ -1759,7 +1759,7 @@
   #define Y_BED_SIZE 255
 #elif TRONXY_PROJ == PROJ_GEMINIS
   #define X_BED_SIZE 300
-  #define Y_BED_SIZE 300
+  #define Y_BED_SIZE 290 // effective space between bed clamps
 #elif TRONXY_PROJ == PROJ_GEMINIX
   #define X_BED_SIZE 330
   #define Y_BED_SIZE 330
@@ -1795,7 +1795,7 @@
 #endif
 
 #if TRONXY_PROJ == PROJ_GEMINIS
-#define Y_TO_BED        -8
+#define Y_TO_BED        -16 // avoid bed clamps
 #else
 #define Y_TO_BED        0
 #endif
