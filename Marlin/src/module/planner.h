@@ -333,7 +333,6 @@ typedef struct {
 #endif
 
 // skew values from which transformation matrices are calculated
-// kept for backwards compatibility and simplicity
 typedef struct {
   #if ENABLED(SKEW_CORRECTION_GCODE)
     float xy;

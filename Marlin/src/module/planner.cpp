@@ -1606,7 +1606,7 @@ void Planner::check_axes_activity() {
   void Planner::calculate_skew_matrices() {
     #if ENABLED(SKEW_CORRECTION_GCODE)
       skew_matrix.i21 = sin(atan(skew_factor.xy));
-      skew_matrix.i22 = sqrt(1.0 - skew_matrix.i21*skew_matrix.i21); // = cos(atan(...))
+      skew_matrix.i22 = sqrt(1.0 - skew_matrix.i21*skew_matrix.i21);
       skew_matrix.t21 = -skew_factor.xy;
       skew_matrix.t22 = 1.0 / skew_matrix.i22;
       #if ENABLED(SKEW_CORRECTION_FOR_Z)
