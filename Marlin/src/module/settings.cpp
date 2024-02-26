@@ -2559,6 +2559,7 @@ void MarlinSettings::postprocess() {
               planner.skew_factor.xz = skew_factor.xz;
               planner.skew_factor.yz = skew_factor.yz;
             #endif
+            planner.calculate_skew_matrices();
           }
         #endif
       }
@@ -3437,6 +3438,7 @@ void MarlinSettings::reset() {
       planner.skew_factor.xz = XZ_SKEW_FACTOR;
       planner.skew_factor.yz = YZ_SKEW_FACTOR;
     #endif
+    planner.calculate_skew_matrices();
   #endif
 
   //

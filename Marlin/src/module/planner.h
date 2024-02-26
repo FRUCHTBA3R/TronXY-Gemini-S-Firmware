@@ -332,6 +332,8 @@ typedef struct {
   #define YZ_SKEW_FACTOR 0
 #endif
 
+// skew values from which transformation matrices are calculated
+// kept for backwards compatibility and simplicity
 typedef struct {
   #if ENABLED(SKEW_CORRECTION_GCODE)
     float xy;
@@ -341,10 +343,33 @@ typedef struct {
       const float xz = XZ_SKEW_FACTOR, yz = YZ_SKEW_FACTOR;
     #endif
   #else
-    const float xy = XY_SKEW_FACTOR,
+    const float xy = XY_SKEW_FACTOR, 
                 xz = XZ_SKEW_FACTOR, yz = YZ_SKEW_FACTOR;
   #endif
 } skew_factor_t;
+
+typedef struct {
+  #if ENABLED(SKEW_CORRECTION_GCODE)
+    float i21, i22;
+    float t21, t22;
+    #if ENABLED(SKEW_CORRECTION_FOR_Z)
+      float i31, i32, i33;
+      float t31, t32, t33;
+    #else
+      const float i31 = 0.0, i32 = 0.0, i33 = 1.0;
+      const float t31 = 0.0, t32 = 0.0, t33 = 1.0;
+    #endif
+  #else
+    const float i21 = sin(atan(XY_SKEW_FACTOR)), i22 = cos(atan(XY_SKEW_FACTOR));
+    const float i31 = sin(atan(XZ_SKEW_FACTOR));
+    const float i32 = (sin(atan(YZ_SKEW_FACTOR)) - i31 * i21) / i22;;
+    const float i33 = sqrt(1.0 - i31*i31 - i32*i32);
+    const float t21 = -XY_SKEW_FACTOR, t22 = 1.0 / i22;
+    const float t33 = 1.0 / i33;
+    const float t32 = -i32 * t33;
+    const float t31 = t21 * t32 - i31 * t33;
+  #endif
+} skew_matrix_t;
 
 #if ENABLED(DISABLE_INACTIVE_EXTRUDER)
   typedef IF<(BLOCK_BUFFER_SIZE > 64), uint16_t, uint8_t>::type last_move_t;
@@ -477,6 +502,7 @@ class Planner {
     #endif
 
     static skew_factor_t skew_factor;
+    static skew_matrix_t skew_matrix;
 
     #if ENABLED(SD_ABORT_ON_ENDSTOP_HIT)
       static bool abort_on_endstop_hit;
@@ -674,24 +700,36 @@ class Planner {
     #endif
 
     #if ENABLED(SKEW_CORRECTION)
-
-      FORCE_INLINE static void skew(float &cx, float &cy, const_float_t cz) {
-        if (COORDINATE_OKAY(cx, X_MIN_POS + 1, X_MAX_POS) && COORDINATE_OKAY(cy, Y_MIN_POS + 1, Y_MAX_POS)) {
-          const float sx = cx - cy * skew_factor.xy - cz * (skew_factor.xz - (skew_factor.xy * skew_factor.yz)),
-                      sy = cy - cz * skew_factor.yz;
-          if (COORDINATE_OKAY(sx, X_MIN_POS, X_MAX_POS) && COORDINATE_OKAY(sy, Y_MIN_POS, Y_MAX_POS)) {
-            cx = sx; cy = sy;
+      
+      static void calculate_skew_matrices();
+      
+      FORCE_INLINE static void skew(float &cx, float &cy, float &cz) {
+        if (COORDINATE_OKAY(cx, X_MIN_POS, X_MAX_POS)
+            && COORDINATE_OKAY(cy, Y_MIN_POS, Y_MAX_POS)
+            && COORDINATE_OKAY(cz, Z_MIN_POS, Z_MAX_POS)) {
+          const float sx = cx + cy * skew_matrix.t21 + cz * skew_matrix.t31,
+                      sy = cy * skew_matrix.t22 + cz * skew_matrix.t32,
+                      sz = cz * skew_matrix.t33;
+          if (COORDINATE_OKAY(sx, X_MIN_POS, X_MAX_POS) 
+              && COORDINATE_OKAY(sy, Y_MIN_POS, Y_MAX_POS)
+              && COORDINATE_OKAY(sz, Z_MIN_POS, Z_MAX_POS)) {
+            cx = sx; cy = sy; cz = sz;
           }
         }
       }
       FORCE_INLINE static void skew(xyz_pos_t &raw) { skew(raw.x, raw.y, raw.z); }
 
-      FORCE_INLINE static void unskew(float &cx, float &cy, const_float_t cz) {
-        if (COORDINATE_OKAY(cx, X_MIN_POS, X_MAX_POS) && COORDINATE_OKAY(cy, Y_MIN_POS, Y_MAX_POS)) {
-          const float sx = cx + cy * skew_factor.xy + cz * skew_factor.xz,
-                      sy = cy + cz * skew_factor.yz;
-          if (COORDINATE_OKAY(sx, X_MIN_POS, X_MAX_POS) && COORDINATE_OKAY(sy, Y_MIN_POS, Y_MAX_POS)) {
-            cx = sx; cy = sy;
+      FORCE_INLINE static void unskew(float &cx, float &cy, float &cz) {
+        if (COORDINATE_OKAY(cx, X_MIN_POS, X_MAX_POS) 
+            && COORDINATE_OKAY(cy, Y_MIN_POS, Y_MAX_POS)
+            && COORDINATE_OKAY(cz, Z_MIN_POS, Z_MAX_POS)) {
+          const float sx = cx + cy * skew_matrix.i21 + cz * skew_matrix.i31,
+                      sy = cy * skew_matrix.i22 + cz * skew_matrix.i32,
+                      sz = cz * skew_matrix.i33;
+          if (COORDINATE_OKAY(sx, X_MIN_POS, X_MAX_POS)
+              && COORDINATE_OKAY(sy, Y_MIN_POS, Y_MAX_POS)
+              && COORDINATE_OKAY(sz, Z_MIN_POS, Z_MAX_POS)) {
+            cx = sx; cy = sy; cz = sz;
           }
         }
       }

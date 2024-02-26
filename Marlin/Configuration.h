@@ -2240,18 +2240,30 @@
  * Bed Skew Compensation
  *
  * This feature corrects for misalignment in the XYZ axes.
- *
+ * 
  * Take the following steps to get the bed skew in the XY plane:
+ *  0. Make sure the steps per unit for your X, Y & Z axis are calibrated correctly.
  *  1. Print a test square (e.g., https://www.thingiverse.com/thing:2563185)
  *  2. For XY_DIAG_AC measure the diagonal A to C
  *  3. For XY_DIAG_BD measure the diagonal B to D
  *  4. For XY_SIDE_AD measure the edge A to D
+ *  5. (optional, but recommended) For XY_SIDE_AB measure the edge A to B
  *
  * Marlin automatically computes skew factors from these measurements.
  * Skew factors may also be computed and set manually:
  *
- *  - Compute AB     : SQRT(2*AC*AC+2*BD*BD-4*AD*AD)/2
+ *  - Compute AB, if step 5. was left out : 
+ *            AB = SQRT(2*AC*AC + 2*BD*BD - 4*AD*AD)/2
+ *  - Compute XY_SKEW_FACTOR :
+ *            XY_SKEW_FACTOR = TAN(PI/2 - ACOS( (AC*AC - BD*BD) / (4*AB*AD) ))
+ * 
  *  - XY_SKEW_FACTOR : TAN(PI/2-ACOS((AC*AC-AB*AB-AD*AD)/(2*AB*AD)))
+ *                        mit AC*AC = AD*AD + CD*CD - 2*AD*CD*cos(delta) 
+ *                        <=> cos(delta) = (AD*AD + CD*CD - AC*AC) / (2*AD*CD)
+ *                        <=> cos(delta) = (AD*AD + AB*AB - AC*AC) / (2*AD*AB)
+ *                        mit acos(x) = PI - acos(-x)
+ *                 <=> tan(PI/2 - (PI - acos(cos(delta))) = tan(delta - PI/2)
+ *                        = tan(PI-alpha - PI/2) = tan(PI/2 - alpha)
  *
  * If desired, follow the same procedure for XZ and YZ.
  * Use these diagrams for reference:
@@ -2263,6 +2275,32 @@
  *    |  A-------D          |  A-------D          |  A-------D
  *    +-------------->X     +-------------->X     +-------------->Y
  *     XY_SKEW_FACTOR        XZ_SKEW_FACTOR        YZ_SKEW_FACTOR
+ * 
+ *        Z
+ *        ^
+ *        |  C
+ *        |  | \
+ *        |  |   B ---- C
+ *  Y _   |  DB. |. C   |
+ *   '\   |    \ |   `. |
+ *      \ |      A ---- D
+ *        +---------------> X
+ * 
+ * Use basis transformation: (wording might be off)
+ * Let the (normalized) basis of the skewed vector space be:
+ *  B_S = {s1, s2, s3}
+ * Since we can align our standard basis B={ex,ey,ez} freely with our skewed space, choose: 
+ *  ex = s1 (aligned x axis)
+ *  s1|z = s2|z = 0 (xy-plane aligned to plane spanned by s1 and s2)
+ * We get:
+ *  B_S = {s1, s2, s3} = {(1, 0, 0)^T, (y1, y2, 0)^T, (z1, z2, z3)^T}
+ * This defines our transformation matrix from B_S to B (unskew function, skew_matrix.iXY values):
+ *  T[B_S->B] = ((1, 0, 0)^T, (y1, y2, 0)^T, (z1, z2, z3)^T)
+ * The inverse of T[B_S->B] transforms from B to B_S (skew function, skew_matrix.tXY values):
+ *  T[B->B_S] = (T[B_S->B])^(-1) = ((1, 0, 0)^T, (-y1/y2, 1/y2, 0)^T, (-z1/z3+y1/y2*z2/z3, -z2/z3, 1/z3)^T)
+ *     / 1 -y1/y2 (y1/y2*z2-z1)/z3 \
+ *  = |  0  1/y2       -z2/z3       |
+ *     \ 0   0          1/z3       /
  */
 #define SKEW_CORRECTION
 
@@ -2271,24 +2309,30 @@
   #define XY_DIAG_AC 282.8427124746
   #define XY_DIAG_BD 282.8427124746
   #define XY_SIDE_AD 200
+  //#define XY_SIDE_AB 200
 
   // Or, set the default skew factors directly here
   // to override the above measurements:
-  #define XY_SKEW_FACTOR 0.0
+  #define XY_SKEW_FACTOR  0.364
 
   #define SKEW_CORRECTION_FOR_Z
   #if ENABLED(SKEW_CORRECTION_FOR_Z)
+    // Note: if you do a all-in-one print: XY_SIDE_AD = XZ_SIDE_AD, XY_SIDE_AB = YZ_SIDE_AD and XZ_SIDE_AB = YZ_SIDE_AB
     #define XZ_DIAG_AC 282.8427124746
     #define XZ_DIAG_BD 282.8427124746
+    #define XZ_SIDE_AD 200
+    //#define XZ_SIDE_AB 200
     #define YZ_DIAG_AC 282.8427124746
     #define YZ_DIAG_BD 282.8427124746
     #define YZ_SIDE_AD 200
-    #define XZ_SKEW_FACTOR 0.0
-    #define YZ_SKEW_FACTOR 0.0
+    //#define YZ_SIDE_AB 200
+    
+    #define XZ_SKEW_FACTOR 0.577
+    #define YZ_SKEW_FACTOR 0.839
   #endif
 
   // Enable this option for M852 to set skew at runtime
-  #define SKEW_CORRECTION_GCODE
+  //#define SKEW_CORRECTION_GCODE
 #endif
 
 //=============================================================================

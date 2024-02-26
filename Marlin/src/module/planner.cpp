@@ -204,6 +204,7 @@ float Planner::mm_per_step[DISTINCT_AXES];      // (mm) Millimeters per step
 #endif
 
 skew_factor_t Planner::skew_factor; // Initialized by settings.load()
+skew_matrix_t Planner::skew_matrix; // Call calculate_skew_matrices() when skew_factor is changed
 
 #if ENABLED(AUTOTEMP)
   celsius_t Planner::autotemp_max = 250,
@@ -1594,6 +1595,29 @@ void Planner::check_axes_activity() {
       TERN_(HAS_CLASSIC_JERK, max_jerk = saved_motion_state.jerk_state);
     }
     refresh_acceleration_rates();
+  }
+
+#endif
+
+#if ENABLED(SKEW_CORRECTION)
+  /**
+   * Calculate the skew transformation matrices from the skew factors
+  */
+  void Planner::calculate_skew_matrices() {
+    #if ENABLED(SKEW_CORRECTION_GCODE)
+      skew_matrix.i21 = sin(atan(skew_factor.xy));
+      skew_matrix.i22 = sqrt(1.0 - skew_matrix.i21*skew_matrix.i21); // = cos(atan(...))
+      skew_matrix.t21 = -skew_factor.xy;
+      skew_matrix.t22 = 1.0 / skew_matrix.i22;
+      #if ENABLED(SKEW_CORRECTION_FOR_Z)
+        skew_matrix.i31 = sin(atan(skew_factor.xz));
+        skew_matrix.i32 = (sin(atan(skew_factor.yz)) - skew_matrix.i31 * skew_matrix.i21) / skew_matrix.i22;
+        skew_matrix.i33 = sqrt(1.0 - skew_matrix.i31*skew_matrix.i31 - skew_matrix.i32*skew_matrix.i32);
+        skew_matrix.t33 = 1.0 / skew_matrix.i33;
+        skew_matrix.t32 = -skew_matrix.i32 * skew_matrix.t33;
+        skew_matrix.t31 = skew_matrix.t21 * skew_matrix.t32 - skew_matrix.i31 * skew_matrix.t33;
+      #endif
+    #endif
   }
 
 #endif
