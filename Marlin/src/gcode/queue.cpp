@@ -769,7 +769,7 @@ void GCodeQueue::advance() {
 
   // The queue may be reset by a command handler or by code invoked by idle() within a handler
   #if TRONXY_UI
-  if(ring_buffer.length) //Only when length is not 0 can it be decremented
+  if(ring_buffer.length) // Only when length is not 0 can it be decremented
   #endif
   ring_buffer.advance_pos(ring_buffer.index_r, -1);
 }
