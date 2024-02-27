@@ -294,10 +294,10 @@ void GCodeParser::parse(char *p) {
   string_arg = nullptr;
   while (const char param = uppercase(*p++)) {  // Get the next parameter. A NUL ends the loop
     
-    // Stop when entering comment
-    // Set string_arg to allow strings starting with ';'
+    // Remove end-of-line comment
     if(param == ';') {
-      if (!string_arg) string_arg = p - 1;
+      // Leading whitespaces can not be removed as command_args might point here
+      p[-1] = '\0';
       break;
     }
     
