@@ -107,7 +107,7 @@ public:
 	* Function name    	:swrite
 	* describe      	:Writing data of a specified length to a specified address in FLASH will erase the data in the associated sector.
 	* parameter      	:addr write address
-	            		:nextEraseAddr The address to be erased
+						:nextEraseAddr The address to be erased
 						:data is the FLASH data address to be written.
 						:byteSize is the size of the data written, in bytes.
 	* return      		:-
