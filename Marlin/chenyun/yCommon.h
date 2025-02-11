@@ -19,7 +19,7 @@
 #error You must define a lcd.
 #endif
 
-/*-->驱动程序需要提供:
+/*-->the driver needs to provide:
 LCD_WArea(int xStart,int yStart,int xEnd,int yEnd);//1.Screen area writing frame
 LCD_RArea(int xStart,int yStart,int xEnd,int yEnd);//2.screen area reading frame
 LCD_BatchStart(const color_t* colors,int num,uint8_t autoInc);//4.Write colors in batches. This interface can be executed after executing 1 and 2.
@@ -48,4 +48,3 @@ extern uint8_t (*EROM_VWrite)(uint32_t addr,const void* data,int len);
 extern uint8_t (*EROM_Write)(uint32_t addr,const void* buff,int len,void *exchangeBuff);
 
 #define INFO_STR(x)
-
