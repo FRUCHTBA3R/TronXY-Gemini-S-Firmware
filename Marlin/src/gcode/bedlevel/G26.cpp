@@ -853,7 +853,7 @@ void GcodeSuite::G26() {
   } while (--g26_repeats && location.valid());
 
   LEAVE:
-  ui.set_status(GET_TEXT_F(MSG_G26_LEAVING), -1);
+  TERN_(HAS_MARLINUI_MENU, ui.set_status(GET_TEXT_F(MSG_G26_LEAVING), -1));
   TERN_(EXTENSIBLE_UI, ExtUI::onMeshUpdate(location, ExtUI::G26_FINISH));
 
   g26.retract_filament(destination);
