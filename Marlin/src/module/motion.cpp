@@ -1336,6 +1336,9 @@ FORCE_INLINE void segment_idle(millis_t &next_idle_ms) {
         case DXC_FULL_CONTROL_MODE: break;
 
         case DXC_AUTO_PARK_MODE: {
+          /**
+          // Following code skips travel moves after G28, which I need for my bed leveling script.
+          // Might also run into prints, when printing multiple objects after another.
           if (current_position.e == destination.e) {
             // This is a travel move (with no extrusion)
             // Skip it, but keep track of the current position
@@ -1346,7 +1349,7 @@ FORCE_INLINE void segment_idle(millis_t &next_idle_ms) {
               delayed_move_time = millis() + 1000UL;
               return true;
             }
-          }
+          } //*/
           //
           // Un-park the active extruder
           //
