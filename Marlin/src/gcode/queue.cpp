@@ -706,7 +706,7 @@ void GCodeQueue::advance() {
   // Process immediate commands
   if (process_injected_command_P() || process_injected_command()) return;
   #if TRONXY_UI
-  if(serialPause || my_print_status == PRINT_ERROR)return; //暂停期间,不执行
+  if(serialPause || my_print_status == PRINT_ERROR)return; // Don't advance during suspension
   #endif
 
   // Return if the G-code buffer is empty

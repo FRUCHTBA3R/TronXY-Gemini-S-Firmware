@@ -335,10 +335,10 @@ void GcodeSuite::process_parsed_command(const bool no_ok/*=false*/) {
 
   KEEPALIVE_STATE(IN_HANDLER);
 
- /**
-  * Block all Gcodes except M511 Unlock Printer, if printer is locked
-  * Will still block Gcodes if M511 is disabled, in which case the printer should be unlocked via LCD Menu
-  */
+  /**
+   * Block all Gcodes except M511 Unlock Printer, if printer is locked
+   * Will still block Gcodes if M511 is disabled, in which case the printer should be unlocked via LCD Menu
+   */
   #if ENABLED(PASSWORD_FEATURE)
     if (password.is_locked && !parser.is_command('M', 511)) {
       SERIAL_ECHO_MSG(STR_PRINTER_LOCKED);
