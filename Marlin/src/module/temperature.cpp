@@ -1468,9 +1468,9 @@ void Temperature::min_temp_error(const heater_id_t heater_id) {
           temp_iState = 0.0;
           work_pid.Kd = 0.0;
         }
-
-        const float max_power_over_i_gain = float(MAX_POW) / tempinfo.pid.Ki - float(MIN_POW);
-        temp_iState = constrain(temp_iState + pid_error, 0, max_power_over_i_gain);
+        
+        const float max_power_over_i_gain = float(PID_FUNCTIONAL_RANGE) * 100; // 100 seconds at max error (?) //float(MAX_POW) / tempinfo.pid.Ki - float(MIN_POW);
+        temp_iState = constrain(temp_iState + pid_error, -max_power_over_i_gain, max_power_over_i_gain);
 
         work_pid.Kp = tempinfo.pid.Kp * pid_error;
         work_pid.Ki = tempinfo.pid.Ki * temp_iState;
