@@ -166,10 +166,10 @@
  *          TMC5130, TMC5130_STANDALONE, TMC5160, TMC5160_STANDALONE
  * :['A4988', 'A5984', 'DRV8825', 'LV8729', 'TB6560', 'TB6600', 'TMC2100', 'TMC2130', 'TMC2130_STANDALONE', 'TMC2160', 'TMC2160_STANDALONE', 'TMC2208', 'TMC2208_STANDALONE', 'TMC2209', 'TMC2209_STANDALONE', 'TMC26X', 'TMC26X_STANDALONE', 'TMC2660', 'TMC2660_STANDALONE', 'TMC5130', 'TMC5130_STANDALONE', 'TMC5160', 'TMC5160_STANDALONE']
  */
-#define X_DRIVER_TYPE  TMC2208_STANDALONE
-#define Y_DRIVER_TYPE  TMC2208_STANDALONE
-#define Z_DRIVER_TYPE  TMC2208_STANDALONE
-#define X2_DRIVER_TYPE TMC2208_STANDALONE
+#define X_DRIVER_TYPE  TMC2209_STANDALONE
+#define Y_DRIVER_TYPE  TMC2209_STANDALONE
+#define Z_DRIVER_TYPE  TMC2209_STANDALONE
+#define X2_DRIVER_TYPE TMC2209_STANDALONE
 //#define Y2_DRIVER_TYPE A4988
 //#define Z2_DRIVER_TYPE TMC2209_STANDALONE
 //#define Z3_DRIVER_TYPE A4988
@@ -180,8 +180,8 @@
 //#define U_DRIVER_TYPE  A4988
 //#define V_DRIVER_TYPE  A4988
 //#define W_DRIVER_TYPE  A4988
-#define E0_DRIVER_TYPE TMC2208_STANDALONE
-#define E1_DRIVER_TYPE TMC2208_STANDALONE
+#define E0_DRIVER_TYPE TMC2209_STANDALONE
+#define E1_DRIVER_TYPE TMC2209_STANDALONE
 //#define E2_DRIVER_TYPE A4988
 //#define E3_DRIVER_TYPE A4988
 //#define E4_DRIVER_TYPE A4988
@@ -1200,7 +1200,7 @@
  * Override with M203
  *                                      X, Y, Z [, I [, J [, K...]]], E0 [, E1[, E2...]]
  */
-#define DEFAULT_MAX_FEEDRATE          { 150, 150, 15, 40 }
+#define DEFAULT_MAX_FEEDRATE          { 600, 150, 15, 40 }
 
 //#define LIMITED_MAX_FR_EDITING        // Limit edit via M203 or LCD to DEFAULT_MAX_FEEDRATE * 2
 #if ENABLED(LIMITED_MAX_FR_EDITING)
@@ -1213,7 +1213,7 @@
  * Override with M201
  *                                      X, Y, Z [, I [, J [, K...]]], E0 [, E1[, E2...]]
  */
-#define DEFAULT_MAX_ACCELERATION      { 500, 500, 100, 1000 }
+#define DEFAULT_MAX_ACCELERATION      { 8000, 800, 100, 2000 }
 
 //#define LIMITED_MAX_ACCEL_EDITING     // Limit edit via M201 or LCD to DEFAULT_MAX_ACCELERATION * 2
 #if ENABLED(LIMITED_MAX_ACCEL_EDITING)
@@ -1773,8 +1773,8 @@
 
 #if TRONXY_PROJ == PROJ_GEMINIS
 #define X_TO_BED          -54
-#define X2_TO_BED         50.3
-#define HOTEND_TO_HOTEND  58.5
+#define X2_TO_BED         57
+#define HOTEND_TO_HOTEND  53  // should be smaller than the magnitude of X_TO_BED and X2_TO_BED or the full bed will not be usable
 #elif TRONXY_PROJ == PROJ_GEMINIXS
 #define X_TO_BED          -52
 #define X2_TO_BED         50
@@ -1803,7 +1803,7 @@
 // Travel limits (linear=mm, rotational=°) after homing, corresponding to endstop positions.
 #define X_MIN_POS X_TO_BED
 #define Y_MIN_POS Y_TO_BED
-#define Z_MIN_POS 0
+#define Z_MIN_POS -0.35  // allow negativ z values just a little more than the shim/paper thickness used for leveling
 #define X_MAX_POS X_BED_SIZE
 #define Y_MAX_POS Y_BED_SIZE
 
@@ -2000,7 +2000,7 @@
 #if ENABLED(FIX_MOUNTED_PROBE)
 #define AUTO_BED_LEVELING_BILINEAR
 #endif
-//#define AUTO_BED_LEVELING_UBL
+//#define AUTO_BED_LEVELING_UBL  // needs lcd controller...
 #define MESH_BED_LEVELING
 
 /**
@@ -2037,7 +2037,7 @@
  * Turn on with the command 'M111 S32'.
  * NOTE: Requires a lot of PROGMEM!
  */
-//#define DEBUG_LEVELING_FEATURE
+#define DEBUG_LEVELING_FEATURE
 
 #if ANY(MESH_BED_LEVELING, AUTO_BED_LEVELING_UBL, PROBE_MANUALLY)
   // Set a height for the start of manual adjustment
