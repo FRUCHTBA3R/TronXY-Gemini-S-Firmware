@@ -673,7 +673,7 @@
 
 #define BANG_MAX 255     // Limits current to nozzle while in bang-bang mode; 255=full current
 #define PID_MAX BANG_MAX // Limits current to nozzle while PID is active (see PID_FUNCTIONAL_RANGE below); 255=full current
-#define PID_K1 0.95      // Smoothing factor within any PID loop
+#define PID_K1 0.85      // Smoothing factor within any PID loop
 
 #if ENABLED(PIDTEMP)
   //#define PID_DEBUG             // Print PID debug data to the serial port. Use 'M303 D' to toggle activation.
@@ -682,9 +682,9 @@
   #if ENABLED(PID_PARAMS_PER_HOTEND)
     // Specify up to one value per hotend here, according to your setup.
     // If there are fewer values, the last one applies to the remaining hotends.
-    #define DEFAULT_Kp_LIST {  18.51,  18.51 }
-    #define DEFAULT_Ki_LIST {   1.36,   1.36 }
-    #define DEFAULT_Kd_LIST {  62.94,  62.94 }
+    #define DEFAULT_Kp_LIST {  20,  20 }
+    #define DEFAULT_Ki_LIST {   2,   2 }
+    #define DEFAULT_Kd_LIST {  200,  200 }
   #else
     #define DEFAULT_Kp  18.51
     #define DEFAULT_Ki   1.36
