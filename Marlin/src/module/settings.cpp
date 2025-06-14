@@ -2844,7 +2844,12 @@ void MarlinSettings::postprocess() {
     // 128 (+1 because of the change to capacity rather than last valid address)
     // is a placeholder for the size of the MAT; the MAT will always
     // live at the very end of the eeprom
-    const uint16_t MarlinSettings::meshes_end = persistentStore.capacity() - 129;
+    #ifdef EEPROM_AT24CXX
+      // access beyond address 2047 crashes, subtract 2048
+      const uint16_t MarlinSettings::meshes_end = persistentStore.capacity() - 129 - 2048;
+    #else
+      const uint16_t MarlinSettings::meshes_end = persistentStore.capacity() - 129;
+    #endif
 
     uint16_t MarlinSettings::meshes_start_index() {
       // Pad the end of configuration data so it can float up
@@ -2883,7 +2888,17 @@ void MarlinSettings::postprocess() {
         #else
           uint8_t * const src = (uint8_t*)&bedlevel.z_values;
         #endif
-
+        
+        /**
+         * write_data crashes for slot 0 to 28
+         * slots 29 to 47 work fine (for 1 byte of data)
+         * slot 29 pos is 2047 -> does storing two bytes crash?
+         * yes, only 2kB usable. Wrong capacity specified?
+         * or reserved memory for tronxy ui?
+         * try with MARLIN_EEPROM_SIZE 0x800, no changes, capacity still returns 4kB
+         * -> reduce meshes_end by 2048
+         */
+        //DEBUG_ECHOLNPGM("E2END=", persistentStore.capacity() - 1, " meshes_end=", meshes_end, " slot=", slot, " pos=", pos, " mss=", MESH_STORE_SIZE);
         // Write crc to MAT along with other data, or just tack on to the beginning or end
         persistentStore.access_start();
         const bool status = persistentStore.write_data(pos, src, MESH_STORE_SIZE, &crc);
