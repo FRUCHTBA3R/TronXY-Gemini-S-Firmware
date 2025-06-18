@@ -28,6 +28,7 @@
 
 #if ENABLED(LCD_BED_LEVELING)
 
+#include "../tft/ui_common.h"
 #include "menu_item.h"
 #include "../../module/planner.h"
 #include "../../feature/bedlevel/bedlevel.h"
@@ -55,6 +56,38 @@
   // LCD probed points are from defaults
   constexpr uint8_t total_probe_points = TERN(AUTO_BED_LEVELING_3POINT, 3, GRID_MAX_POINTS);
 
+  #if ALL(HAS_PREHEAT, PREHEAT_BEFORE_LEVELING)
+
+    void _lcd_preheat_wait() {
+      if (ui.should_draw()) {
+        //touch.add_control(BACK, 0, 0, TFT_WIDTH, TFT_HEIGHT);
+        MenuItem_static::draw(LCD_HEIGHT >= 4, GET_TEXT_F(MSG_PREHEATING));
+        // only for ui_480x320
+        draw_heater_status((TFT_WIDTH / 4) - 40, MENU_LINE_HEIGHT * (1 + (LCD_HEIGHT >= 4)), H_E0);
+        draw_heater_status((3 * TFT_WIDTH / 4) - 40, MENU_LINE_HEIGHT * (1 + (LCD_HEIGHT >= 4)), H_BED);
+      }
+      if (TERN1(HAS_HOTEND, thermalManager.degHotendNear(0, thermalManager.degTargetHotend(0)))
+      && TERN1(HAS_HEATED_BED, thermalManager.degBedNear(thermalManager.degTargetBed()))) {
+        ui.completion_feedback();
+      //} else if (!ui.use_click()) return;
+        ui.goto_previous_screen_no_defer();
+      }
+      ui.refresh(LCDVIEW_CALL_REDRAW_NEXT);
+    }
+
+    void _lcd_preheat_level() {
+      ui.defer_status_screen();
+      ui.goto_screen(_lcd_preheat_wait);
+      #if HAS_HOTEND
+        thermalManager.setTargetHotend(LEVELING_NOZZLE_TEMP, 0);
+      #endif
+      #if HAS_HEATED_BED
+        thermalManager.setTargetBed(LEVELING_BED_TEMP);
+      #endif
+    }
+
+  #endif
+  
   //
   // Bed leveling is done. Wait for G29 to complete.
   // A flag is used so that this can release control
@@ -245,9 +278,14 @@ void menu_bed_leveling() {
   #if NONE(PROBE_MANUALLY, MESH_BED_LEVELING)
     if (!is_homed) GCODES_ITEM(MSG_AUTO_HOME, FPSTR(G28_STR));
   #endif
-
+  
+  // Preheat
+  #if ANY(PROBE_MANUALLY, MESH_BED_LEVELING) && ALL(HAS_PREHEAT, PREHEAT_BEFORE_LEVELING)
+    SUBMENU(MSG_PREHEAT, _lcd_preheat_level);
+  #endif
+  
   // Level Bed
-  #if EITHER(PROBE_MANUALLY, MESH_BED_LEVELING)
+  #if ANY(PROBE_MANUALLY, MESH_BED_LEVELING)
     // Manual leveling uses a guided procedure
     SUBMENU(MSG_LEVEL_BED, _lcd_level_bed_continue);
   #else
@@ -282,6 +320,7 @@ void menu_bed_leveling() {
       #define LCD_Z_OFFSET_TYPE float42_52 // Values from -99.99 to 99.99
     #endif
     EDIT_ITEM(LCD_Z_OFFSET_TYPE, MSG_BED_Z, &bedlevel.z_offset, Z_PROBE_OFFSET_RANGE_MIN, Z_PROBE_OFFSET_RANGE_MAX);
+    if(is_valid) GCODES_ITEM(MSG_MESH_MEAN_Z, F("M420C"));
   #endif
 
   #if ENABLED(BABYSTEP_ZPROBE_OFFSET)
