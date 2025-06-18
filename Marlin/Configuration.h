@@ -1520,7 +1520,7 @@
  *     |    [-]    |
  *     O-- FRONT --+
  */
-#define NOZZLE_TO_PROBE_OFFSET { 10, 10, 0 }
+#define NOZZLE_TO_PROBE_OFFSET { 0, 0, 0 }
 
 // Most probes should stay away from the edges of the bed, but
 // with NOZZLE_AS_PROBE this can be negative for a wider probing area.
@@ -1602,11 +1602,11 @@
 #define Z_CLEARANCE_MULTI_PROBE     5 // Z Clearance between multiple probes
 //#define Z_AFTER_PROBING           5 // Z position after probing is done
 
-#define Z_PROBE_LOW_POINT          -2 // Farthest distance below the trigger-point to go before stopping
+#define Z_PROBE_LOW_POINT          -0.5 // Farthest distance below the trigger-point to go before stopping
 
-// For M851 give a range for adjusting the Z probe offset
-#define Z_PROBE_OFFSET_RANGE_MIN -20
-#define Z_PROBE_OFFSET_RANGE_MAX 20
+// For M851 give a range for adjusting the Z probe offset (stay between -9 and 9 for more accurate z offset ui)
+#define Z_PROBE_OFFSET_RANGE_MIN -5
+#define Z_PROBE_OFFSET_RANGE_MAX 5
 
 // Enable the M48 repeatability test to test probe accuracy
 //#define Z_MIN_PROBE_REPEATABILITY_TEST
@@ -1637,8 +1637,8 @@
 // Require minimum nozzle and/or bed temperature for probing
 //#define PREHEAT_BEFORE_PROBING
 #if ENABLED(PREHEAT_BEFORE_PROBING)
-  #define PROBING_NOZZLE_TEMP 120   // (°C) Only applies to E0 at this time
-  #define PROBING_BED_TEMP     50
+  #define PROBING_NOZZLE_TEMP 200   // (°C) Only applies to E0 at this time
+  #define PROBING_BED_TEMP     55
 #endif
 
 // For Inverting Stepper Enable Pins (Active Low) use 0, Non Inverting (Active High) use 1
@@ -1731,7 +1731,7 @@
 //#define Z_HOMING_HEIGHT  4      // (mm) Minimal Z height before homing (G28) for Z clearance above the bed, clamps, ...
                                   // Be sure to have this much clearance over your Z_MAX_POS to prevent grinding.
 
-//#define Z_AFTER_HOMING  10      // (mm) Height to move to after homing Z
+#define Z_AFTER_HOMING  10      // (mm) Height to move to after homing Z
 
 // Direction of endstops when homing; 1=MAX, -1=MIN
 // :[-1,1]
@@ -2000,27 +2000,31 @@
 #if ENABLED(FIX_MOUNTED_PROBE)
 #define AUTO_BED_LEVELING_BILINEAR
 #endif
-#define AUTO_BED_LEVELING_UBL  // needs lcd controller... or does it?
-//#define MESH_BED_LEVELING
+/**
+*  UBL seems really buggy, specifically with manual leveling.
+*  It also lacks a global z offset, which is a requirement when leveling with a feeler gauge
+*/
+//#define AUTO_BED_LEVELING_UBL  // switching back to marlin ui for this, as tronxy ui > manual move keeps raising z
+#define MESH_BED_LEVELING
 
 /**
  * Normally G28 leaves leveling disabled on completion. Enable one of
  * these options to restore the prior leveling state or to always enable
  * leveling immediately after G28.
  */
-#if ENABLED(FIX_MOUNTED_PROBE)
+//#if ENABLED(FIX_MOUNTED_PROBE)
 #define RESTORE_LEVELING_AFTER_G28
-#endif
-#define ENABLE_LEVELING_AFTER_G28
+//#endif
+//#define ENABLE_LEVELING_AFTER_G28
 
 /**
  * Auto-leveling needs preheating
  */
-// doesn't work
+// doesn't work for manual leveling, but used in custom preheat menu for bed leveling
 #define PREHEAT_BEFORE_LEVELING
 #if ENABLED(PREHEAT_BEFORE_LEVELING)
-  #define LEVELING_NOZZLE_TEMP 140   // (°C) Only applies to E0 at this time
-  #define LEVELING_BED_TEMP     50
+  #define LEVELING_NOZZLE_TEMP 200   // (°C) Only applies to E0 at this time
+  #define LEVELING_BED_TEMP     55
 #endif
 
 /**
@@ -2041,7 +2045,7 @@
 
 #if ANY(MESH_BED_LEVELING, AUTO_BED_LEVELING_UBL, PROBE_MANUALLY)
   // Set a height for the start of manual adjustment
-  #define MANUAL_PROBE_START_Z 0.2  // (mm) Comment out to use the last-measured height
+  #define MANUAL_PROBE_START_Z 0.1  // (mm) Comment out to use the last-measured height
 #endif
 
 #if ANY(MESH_BED_LEVELING, AUTO_BED_LEVELING_BILINEAR, AUTO_BED_LEVELING_UBL)
@@ -2142,21 +2146,21 @@
  * Add a bed leveling sub-menu for ABL or MBL.
  * Include a guided procedure if manual probing is enabled.
  */
-//#define LCD_BED_LEVELING
+#define LCD_BED_LEVELING
 
 #if ENABLED(LCD_BED_LEVELING)
-  #define MESH_EDIT_Z_STEP  0.01 // (mm) Step size while manually probing Z axis.
+  #define MESH_EDIT_Z_STEP  0.005 // (mm) Step size while manually probing Z axis.
   #define LCD_PROBE_Z_RANGE 4     // (mm) Z Range centered on Z_MIN_POS for LCD Z adjustment
   #define MESH_EDIT_MENU        // Add a menu to edit mesh points
 #endif
 
 // Add a menu item to move between bed corners for manual bed adjustment
-//#define LCD_BED_TRAMMING
+#define LCD_BED_TRAMMING  // UBL without probe requires a pre leveled bed, recommended for mesh leveling
 
 #if ENABLED(LCD_BED_TRAMMING)
-  #define BED_TRAMMING_INSET_LFRB { 30, 30, 30, 30 } // (mm) Left, Front, Right, Back insets
+  #define BED_TRAMMING_INSET_LFRB { 31, 24, 28, 25 } // (mm) Left, Front, Right, Back insets
   #define BED_TRAMMING_HEIGHT      0.0        // (mm) Z height of nozzle at leveling points
-  #define BED_TRAMMING_Z_HOP       4.0        // (mm) Z height of nozzle between leveling points
+  #define BED_TRAMMING_Z_HOP       10.0        // (mm) Z height of nozzle between leveling points
   //#define BED_TRAMMING_INCLUDE_CENTER       // Move to the center after the last corner
   //#define BED_TRAMMING_USE_PROBE
   #if ENABLED(BED_TRAMMING_USE_PROBE)
@@ -2382,17 +2386,23 @@
 #define PREHEAT_1_TEMP_CHAMBER 35
 #define PREHEAT_1_FAN_SPEED     0
 #else
-#define PREHEAT_1_LABEL       "PLA"
-#define PREHEAT_1_TEMP_HOTEND 180
-#define PREHEAT_1_TEMP_BED     70
-#define PREHEAT_1_TEMP_CHAMBER 35
-#define PREHEAT_1_FAN_SPEED     0 // Value from 0 to 255
+#define PREHEAT_1_LABEL       "PETG"
+#define PREHEAT_1_TEMP_HOTEND  230
+#define PREHEAT_1_TEMP_BED      55
+#define PREHEAT_1_TEMP_CHAMBER  35
+#define PREHEAT_1_FAN_SPEED      0  // Value from 0 to 255
 
-#define PREHEAT_2_LABEL       "ABS"
-#define PREHEAT_2_TEMP_HOTEND 240
-#define PREHEAT_2_TEMP_BED    110
-#define PREHEAT_2_TEMP_CHAMBER 35
-#define PREHEAT_2_FAN_SPEED     0 // Value from 0 to 255
+#define PREHEAT_2_LABEL       "PLA"
+#define PREHEAT_2_TEMP_HOTEND  180
+#define PREHEAT_2_TEMP_BED      50
+#define PREHEAT_2_TEMP_CHAMBER  35
+#define PREHEAT_2_FAN_SPEED      0  // Value from 0 to 255
+
+#define PREHEAT_3_LABEL       "ABS"
+#define PREHEAT_3_TEMP_HOTEND  240
+#define PREHEAT_3_TEMP_BED     110
+#define PREHEAT_3_TEMP_CHAMBER  35
+#define PREHEAT_3_FAN_SPEED      0  // Value from 0 to 255
 #endif
 
 // @section motion

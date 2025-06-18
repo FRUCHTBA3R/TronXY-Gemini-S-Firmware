@@ -8,7 +8,7 @@
 #define UI_SIM480X320      2
 
 #define TRONXY_PROJ        PROJ_GEMINIS
-#define TRONXY_UI          UI_SIM480X320
+#define TRONXY_UI          UI_MARLIN_DEFAULT  // UI_SIM480X320
 
 #if TRONXY_UI > 0
 #define HAS_TRONXY_UI      1
