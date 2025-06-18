@@ -55,6 +55,7 @@ void unified_bed_leveling::report_current_mesh() {
       SERIAL_ECHOLNPAIR_F_P(SP_Z_STR, z_values[x][y], 4);
       serial_delay(75); // Prevent Printrun from exploding
     }
+    SERIAL_ECHO_MSG("  <z offset here>");
 }
 
 void unified_bed_leveling::report_state() {
@@ -65,6 +66,7 @@ void unified_bed_leveling::report_state() {
 
 int8_t unified_bed_leveling::storage_slot;
 
+float unified_bed_leveling::z_offset;
 float unified_bed_leveling::z_values[GRID_MAX_POINTS_X][GRID_MAX_POINTS_Y];
 
 #define _GRIDPOS(A,N) (MESH_MIN_##A + N * (MESH_##A##_DIST))
@@ -91,6 +93,7 @@ void unified_bed_leveling::reset() {
   const bool was_enabled = planner.leveling_active;
   set_bed_leveling_enabled(false);
   storage_slot = -1;
+  z_offset = 0;
   ZERO(z_values);
   #if ENABLED(EXTENSIBLE_UI)
     GRID_LOOP(x, y) ExtUI::onMeshUpdate(x, y, 0);
@@ -149,7 +152,7 @@ static void serial_echo_xy(const uint8_t sp, const int16_t x, const int16_t y) {
 
 static void serial_echo_column_labels(const uint8_t sp) {
   SERIAL_ECHO_SP(7);
-  LOOP_L_N(i, GRID_MAX_POINTS_X) {
+  for (uint8_t i = 0; i < GRID_MAX_POINTS_X; ++i) {
     if (i < 10) SERIAL_CHAR(' ');
     SERIAL_ECHO(i);
     SERIAL_ECHO_SP(sp);
@@ -199,7 +202,7 @@ void unified_bed_leveling::display_map(const uint8_t map_type) {
     }
 
     // Row Values (I indexes)
-    LOOP_L_N(i, GRID_MAX_POINTS_X) {
+    for (uint8_t i = 0; i < GRID_MAX_POINTS_X; ++i) {
 
       // Opening Brace or Space
       const bool is_current = i == curr.x && j == curr.y;
@@ -260,7 +263,7 @@ bool unified_bed_leveling::sanity_check() {
    */
   void GcodeSuite::M1004() {
 
-    #define ALIGN_GCODE TERN(Z_STEPPER_AUTO_ALIGN, "G34", "")
+    #define ALIGN_GCODE TERN(Z_STEPPER_AUTO_ALIGN, "G34\n", "")
     #define PROBE_GCODE TERN(HAS_BED_PROBE, "G29P1\nG29P3", "G29P4R")
 
     #if HAS_HOTEND
@@ -280,7 +283,7 @@ bool unified_bed_leveling::sanity_check() {
     #endif
 
     process_subcommands_now(FPSTR(G28_STR));      // Home
-    process_subcommands_now(F(ALIGN_GCODE "\n"    // Align multi z axis if available
+    process_subcommands_now(F(ALIGN_GCODE         // Align multi z axis if available
                               PROBE_GCODE "\n"    // Build mesh with available hardware
                               "G29P3\nG29P3"));   // Ensure mesh is complete by running smart fill twice
 

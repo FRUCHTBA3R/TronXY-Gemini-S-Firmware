@@ -195,7 +195,7 @@ float Planner::mm_per_step[DISTINCT_AXES];      // (mm) Millimeters per step
     matrix_3x3 Planner::bed_level_matrix; // Transform to compensate for bed level
   #endif
   #if ENABLED(ENABLE_LEVELING_FADE_HEIGHT)
-    float Planner::z_fade_height,      // Initialized by settings.load()
+    float Planner::z_fade_height,      // Initialized by settings.load
           Planner::inverse_z_fade_height,
           Planner::last_fade_z;
   #endif
@@ -203,8 +203,10 @@ float Planner::mm_per_step[DISTINCT_AXES];      // (mm) Millimeters per step
   constexpr bool Planner::leveling_active;
 #endif
 
-skew_factor_t Planner::skew_factor; // Initialized by settings.load()
-skew_matrix_t Planner::skew_matrix; // Call calculate_skew_matrices() when skew_factor is changed
+#if ENABLED(SKEW_CORRECTION)
+  skew_factor_t Planner::skew_factor; // Initialized by settings.load
+  skew_matrix_t Planner::skew_matrix; // Call calculate_skew_matrices() when skew_factor is changed
+#endif
 
 #if ENABLED(AUTOTEMP)
   celsius_t Planner::autotemp_max = 250,
@@ -258,11 +260,15 @@ void Planner::init() {
   position.reset();
   TERN_(HAS_POSITION_FLOAT, position_float.reset());
   TERN_(IS_KINEMATIC, position_cart.reset());
+
   previous_speed.reset();
   previous_nominal_speed = 0;
+
   TERN_(ABL_PLANAR, bed_level_matrix.set_to_identity());
+
   clear_block_buffer();
   delay_before_delivering = 0;
+
   #if ENABLED(DIRECT_STEPPING)
     last_page_step_rate = 0;
     last_page_dir.reset();
@@ -1651,7 +1657,7 @@ void Planner::check_axes_activity() {
         raw.z += bedlevel.get_z_correction(raw);
       #endif
 
-      TERN_(MESH_BED_LEVELING, raw.z += bedlevel.get_z_offset());
+      /*TERN_(MESH_BED_LEVELING, */raw.z += bedlevel.get_z_offset();
 
     #endif
   }
@@ -1670,7 +1676,7 @@ void Planner::check_axes_activity() {
     #elif HAS_MESH
 
       const float z_correction = bedlevel.get_z_correction(raw),
-                  z_full_fade = DIFF_TERN(MESH_BED_LEVELING, raw.z, bedlevel.get_z_offset()),
+                  z_full_fade = raw.z - bedlevel.get_z_offset(),  // DIFF_TERN
                   z_no_fade = z_full_fade - z_correction;
 
       #if ENABLED(ENABLE_LEVELING_FADE_HEIGHT)
@@ -3201,9 +3207,10 @@ bool Planner::buffer_segment(const abce_pos_t &abce
 bool Planner::buffer_line(const xyze_pos_t &cart, const_feedRate_t fr_mm_s
   , const uint8_t extruder/*=active_extruder*/
   , const PlannerHints &hints/*=PlannerHints()*/
+  , const bool apply_leveling/*=ENABLED(PLANNER_LEVELING)*/
 ) {
   xyze_pos_t machine = cart;
-  TERN_(HAS_POSITION_MODIFIERS, apply_modifiers(machine));
+  TERN_(HAS_POSITION_MODIFIERS, apply_modifiers(machine, apply_leveling));
 
   #if IS_KINEMATIC
 
@@ -3246,9 +3253,13 @@ bool Planner::buffer_line(const xyze_pos_t &cart, const_feedRate_t fr_mm_s
       return true;
     }
     return false;
-  #else
+
+  #else // !IS_KINEMATIC
+
     return buffer_segment(machine, fr_mm_s, extruder, hints);
+
   #endif
+
 } // buffer_line()
 
 #if ENABLED(DIRECT_STEPPING)

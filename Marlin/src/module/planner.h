@@ -900,6 +900,7 @@ class Planner {
     static bool buffer_line(const xyze_pos_t &cart, const_feedRate_t fr_mm_s
       , const uint8_t extruder=active_extruder
       , const PlannerHints &hints=PlannerHints()
+      , const bool apply_leveling=ENABLED(PLANNER_LEVELING)
     );
 
     #if ENABLED(DIRECT_STEPPING)

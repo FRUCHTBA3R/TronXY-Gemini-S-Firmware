@@ -29,6 +29,13 @@
 
 #include "motion.h"
 
+#if ENABLED(BLTOUCH)
+  #include "../feature/bltouch.h"
+#endif
+
+#define DEBUG_OUT ENABLED(DEBUG_LEVELING_FEATURE)
+#include "../core/debug_out.h"
+
 #if HAS_BED_PROBE
   enum ProbePtRaise : uint8_t {
     PROBE_PT_NONE,      // No raise or stow after run_z_probe
@@ -74,9 +81,7 @@ class Probe {
 public:
 
   #if ENABLED(SENSORLESS_PROBING)
-    typedef struct {
-        bool x:1, y:1, z:1;
-    } sense_bool_t;
+    typedef struct { bool x:1, y:1, z:1; } sense_bool_t;
     static sense_bool_t test_sensitivity;
   #endif
 
@@ -85,8 +90,8 @@ public:
     static xyz_pos_t offset;
     #endif
 
-    #if EITHER(PREHEAT_BEFORE_PROBING, PREHEAT_BEFORE_LEVELING)
-      static void preheat_for_probing(const celsius_t hotend_temp, const celsius_t bed_temp);
+    #if ANY(PREHEAT_BEFORE_PROBING, PREHEAT_BEFORE_LEVELING)
+      static void preheat_for_probing(const celsius_t hotend_temp, const celsius_t bed_temp, const bool early=false);
     #endif
 
     static void probe_error_stop();
@@ -149,7 +154,7 @@ public:
       return probe_at_point(pos.x, pos.y, raise_after, verbose_level, probe_relative, sanity_check);
     }
 
-  #else
+  #else // !HAS_BED_PROBE
 
     static constexpr xyz_pos_t offset = xyz_pos_t(NUM_AXIS_ARRAY(0, 0, 0, 0, 0, 0)); // See #16767
 
@@ -157,7 +162,9 @@ public:
 
     static bool can_reach(const_float_t rx, const_float_t ry, const bool=true) { return position_is_reachable(rx, ry); }
 
-  #endif
+  #endif // !HAS_BED_PROBE
+
+  static void use_probing_tool(const bool=true) IF_DISABLED(DO_TOOLCHANGE_FOR_PROBING, {});
 
   static void move_z_after_homing() {
     #ifdef Z_AFTER_HOMING

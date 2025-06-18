@@ -38,6 +38,10 @@
   #include "../lcd/marlinui.h"
 #endif
 
+#if ENABLED(POLAR)
+  #include "polar.h"
+#endif
+
 #if HAS_BED_PROBE
   #include "probe.h"
 #endif
@@ -69,8 +73,17 @@
 #define DEBUG_OUT ENABLED(DEBUG_LEVELING_FEATURE)
 #include "../core/debug_out.h"
 
+#if ENABLED(BD_SENSOR)
+  #include "../feature/bedlevel/bdl/bdl.h"
+#endif
+
 // Relative Mode. Enable with G91, disable with G90.
-bool relative_mode; // = false;
+bool relative_mode; // = false
+
+#if HAS_Z_AXIS
+  // If Z has been powered on trust that the real Z is >= current_position.z
+  bool z_min_trusted; // = false
+#endif
 
 /**
  * Cartesian Current Position
@@ -101,7 +114,9 @@ xyze_pos_t destination; // {0}
 #endif
 
 // The active extruder (tool). Set with T<extruder> command.
-uint8_t active_extruder = 0; // = 0
+#if HAS_MULTI_EXTRUDER
+  uint8_t active_extruder = 0; // = 0
+#endif
 
 #if ENABLED(LCD_SHOW_E_TOTAL)
   float e_move_accumulator; // = 0
@@ -109,7 +124,7 @@ uint8_t active_extruder = 0; // = 0
 
 // Extruder offsets
 #if HAS_HOTEND_OFFSET
-  xyz_pos_t hotend_offset[HOTENDS]; // Initialized by settings.load()
+  xyz_pos_t hotend_offset[HOTENDS]; // Initialized by settings.load
   void reset_hotend_offsets() {
     constexpr float tmp[XYZ][HOTENDS] = { HOTEND_OFFSET_X, HOTEND_OFFSET_Y, HOTEND_OFFSET_Z };
     static_assert(
@@ -708,7 +723,45 @@ void do_blocking_move_to_x(const_float_t rx, const_feedRate_t fr_mm_s/*=0.0*/) {
   void do_blocking_move_to_z(const_float_t rz, const_feedRate_t fr_mm_s/*=0.0*/) {
     do_blocking_move_to_xy_z(current_position, rz, fr_mm_s);
   }
-#endif
+  
+  /**
+   * Move Z to a particular height so the nozzle or deployed probe clears the bed.
+   * (Use do_z_clearance_by for clearance over the current position.)
+   *  - For a probe, add clearance for the probe distance
+   *  - Constrain to the Z max physical position
+   *  - If lowering is not allowed then skip a downward move
+   *  - Execute the move at the probing (or homing) feedrate
+   */
+  void do_z_clearance(const_float_t zclear, const bool with_probe/*=true*/, const bool lower_allowed/*=false*/) {
+    UNUSED(with_probe);
+    float zdest = zclear;
+    TERN_(HAS_BED_PROBE, if (with_probe && probe.offset.z < 0) zdest -= probe.offset.z);
+    NOMORE(zdest, Z_MAX_POS);
+    if (DEBUGGING(LEVELING)) DEBUG_ECHOLNPGM("do_z_clearance(", zclear, " [", current_position.z, " to ", zdest, "], ", lower_allowed, ")");
+    if ((!lower_allowed && zdest < current_position.z) || zdest == current_position.z) return;
+    do_blocking_move_to_z(zdest, TERN(HAS_BED_PROBE, z_probe_fast_mm_s, homing_feedrate(Z_AXIS)));
+  }
+  void do_z_clearance_by(const_float_t zclear) {
+    if (DEBUGGING(LEVELING)) DEBUG_ECHOLNPGM("do_z_clearance_by(", zclear, ")");
+    do_z_clearance(current_position.z + zclear, false);
+  }
+  /**
+   * Move Z to Z_POST_CLEARANCE,
+   * The axis is allowed to move down.
+   */
+  void do_move_after_z_homing() {
+    DEBUG_SECTION(mzah, "do_move_after_z_homing", DEBUGGING(LEVELING));
+    #ifdef Z_POST_CLEARANCE
+      do_z_clearance(
+        Z_POST_CLEARANCE,
+        ALL(HOMING_Z_WITH_PROBE, HAS_STOWABLE_PROBE) && TERN0(HAS_BED_PROBE, endstops.z_probe_enabled),
+        true
+      );
+    #elif ENABLED(USE_PROBE_FOR_Z_HOMING)
+      probe.move_z_after_probing();
+    #endif
+  }
+#endif // HAS_Z_AXIS
 
 #if HAS_I_AXIS
   void do_blocking_move_to_i(const_float_t ri, const_feedRate_t fr_mm_s/*=0.0*/) {
@@ -1430,7 +1483,7 @@ FORCE_INLINE void segment_idle(millis_t &next_idle_ms) {
 void prepare_line_to_destination() {
   apply_motion_limits(destination);
 
-  #if EITHER(PREVENT_COLD_EXTRUSION, PREVENT_LENGTHY_EXTRUDE)
+  #if ANY(PREVENT_COLD_EXTRUSION, PREVENT_LENGTHY_EXTRUDE)
 
     if (!DEBUGGING(DRYRUN) && destination.e != current_position.e) {
       bool ignore_e = false;
