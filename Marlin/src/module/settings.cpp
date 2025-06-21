@@ -765,7 +765,7 @@ void MarlinSettings::postprocess() {
   /**
    * M500 - Store Configuration
    */
-  bool MarlinSettings::save() {
+  bool MarlinSettings::save(const bool first_save_after_flash) {
     float dummyf = 0;
     char ver[4] = "ERR";
 
@@ -857,8 +857,16 @@ void MarlinSettings::postprocess() {
       SHOW_HERE_INDEX("grid_spacing:");
       #endif
       #if ENABLED(AUTO_BED_LEVELING_BILINEAR)
-        EEPROM_WRITE(bedlevel.grid_spacing);
-        EEPROM_WRITE(bedlevel.grid_start);
+        #if ENABLED(EEPROM_INIT_NOW, EEPROM_INIT_NOW_KEEP_MESH)
+          if (first_save_after_flash) {
+            EEPROM_READ(bedlevel.grid_spacing);
+            EEPROM_READ(bedlevel.grid_start);
+          } else
+        #endif
+        {
+          EEPROM_WRITE(bedlevel.grid_spacing);
+          EEPROM_WRITE(bedlevel.grid_start);
+        }
       #else
         const xy_pos_t bilinear_grid_spacing{0}, bilinear_start{0};
         EEPROM_WRITE(bilinear_grid_spacing);
@@ -866,6 +874,13 @@ void MarlinSettings::postprocess() {
       #endif
 
       #if ENABLED(AUTO_BED_LEVELING_BILINEAR)
+        #if ENABLED(EEPROM_INIT_NOW, EEPROM_INIT_NOW_KEEP_MESH)
+          if (first_save_after_flash) {
+            EEPROM_READ(bedlevel.z_values);
+            bedlevel.refresh_bed_level();
+          }
+          else
+        #endif
         EEPROM_WRITE(bedlevel.z_values);              // 9-256 floats
       #else
         dummyf = 0;
@@ -942,6 +957,12 @@ void MarlinSettings::postprocess() {
     //
     {
       const float zfh = TERN(ENABLE_LEVELING_FADE_HEIGHT, planner.z_fade_height, (DEFAULT_LEVELING_FADE_HEIGHT));
+      #if ENABLED(ENABLE_LEVELING_FADE_HEIGHT, EEPROM_INIT_NOW, EEPROM_INIT_NOW_KEEP_MESH)
+        if (first_save_after_flash) {
+          EEPROM_READ(new_z_fade_height);
+          set_z_fade_height(new_z_fade_height, false); // false = no report
+        } else
+      #endif
       EEPROM_WRITE(zfh);
     }
 
@@ -961,11 +982,21 @@ void MarlinSettings::postprocess() {
       const uint8_t mesh_num_x = TERN(MESH_BED_LEVELING, GRID_MAX_POINTS_X, 3),
                     mesh_num_y = TERN(MESH_BED_LEVELING, GRID_MAX_POINTS_Y, 3);
 
+      #if ENABLED(EEPROM_INIT_NOW, EEPROM_INIT_NOW_KEEP_MESH, MESH_BED_LEVELING)
+        if (first_save_after_flash) {
+          EEPROM_READ(bedlevel.z_offset);
+        } else
+      #endif
       EEPROM_WRITE(TERN(MESH_BED_LEVELING, bedlevel.z_offset, dummyf));
+
       EEPROM_WRITE(mesh_num_x);
       EEPROM_WRITE(mesh_num_y);
 
       #if ENABLED(MESH_BED_LEVELING)
+        #if ENABLED(EEPROM_INIT_NOW, EEPROM_INIT_NOW_KEEP_MESH)
+          if (first_save_after_flash) EEPROM_READ(bedlevel.z_values);
+          else
+        #endif
         EEPROM_WRITE(bedlevel.z_values);
       #else
         for (uint8_t q = mesh_num_x * mesh_num_y; q--;) EEPROM_WRITE(dummyf);
@@ -977,6 +1008,10 @@ void MarlinSettings::postprocess() {
     //
     {
       #if ABL_PLANAR
+        #if ENABLED(EEPROM_INIT_NOW, EEPROM_INIT_NOW_KEEP_MESH)
+          if (first_save_after_flash) EEPROM_READ(planner.bed_level_matrix)
+          else
+        #endif
         EEPROM_WRITE(planner.bed_level_matrix);
       #else
         dummyf = 0;
@@ -1741,8 +1776,8 @@ void MarlinSettings::postprocess() {
   /**
    * M501 - Retrieve Configuration
    */
-  bool MarlinSettings::_load() {
-    if (!EEPROM_START(EEPROM_OFFSET)) return false;
+  MarlinSettings::ValidationState MarlinSettings::_load() {
+    if (!EEPROM_START(EEPROM_OFFSET)) return INVALID;
     
     uint8_t stored_ver[4];
     EEPROM_READ_ALWAYS(stored_ver);
@@ -1772,7 +1807,10 @@ void MarlinSettings::postprocess() {
       #if ENABLED(EEPROM_INIT_NOW)
         uint32_t stored_hash;
         EEPROM_READ_ALWAYS(stored_hash);
-        if (stored_hash != build_hash) { EEPROM_FINISH(); return false; }
+        if (stored_hash != build_hash) { 
+          EEPROM_FINISH();
+          return INVALID_AFTER_FLASH; 
+        }
       #endif
       #ifndef EEPROM_AT24CXX
       uint16_t stored_crc;
@@ -2798,37 +2836,38 @@ void MarlinSettings::postprocess() {
 
     EEPROM_FINISH();
 
-    return !eeprom_error;
+    return eeprom_error ? INVALID : VALID;
   }
 
   #ifdef ARCHIM2_SPI_FLASH_EEPROM_BACKUP_SIZE
     extern bool restoreEEPROM();
   #endif
 
-  bool MarlinSettings::validate() {
+  MarlinSettings::ValidationState MarlinSettings::validate() {
     validating = true;
     #ifdef ARCHIM2_SPI_FLASH_EEPROM_BACKUP_SIZE
-      bool success = _load();
+      const ValidationState success = _load();
       if (!success && restoreEEPROM()) {
         SERIAL_ECHOLNPGM("Recovered backup EEPROM settings from SPI Flash");
         success = _load();
       }
     #else
-      const bool success = _load();
+      const ValidationState success = _load();
     #endif
     validating = false;
     return success;
   }
 
   bool MarlinSettings::load() {
-    if (validate()) {
-      const bool success = _load();
+    const ValidationState valid = validate();
+    if (valid == VALID) {
+      const bool success = _load() == VALID;
       TERN_(EXTENSIBLE_UI, ExtUI::onSettingsLoaded(success));
       return success;
     }
     reset();
-    #if EITHER(EEPROM_AUTO_INIT, EEPROM_INIT_NOW)
-      (void)save();
+    #if ANY(EEPROM_AUTO_INIT, EEPROM_INIT_NOW)
+      (void)save(valid == INVALID_AFTER_FLASH);
       SERIAL_ECHO_MSG("EEPROM Initialized");
     #endif
     return false;
@@ -2977,7 +3016,7 @@ void MarlinSettings::postprocess() {
 
 #else // !EEPROM_SETTINGS
 
-  bool MarlinSettings::save() {
+  bool MarlinSettings::save(const bool first_save_after_flash) {
     DEBUG_ERROR_MSG("EEPROM disabled");
     return false;
   }

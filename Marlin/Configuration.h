@@ -2008,6 +2008,11 @@
 #define MESH_BED_LEVELING
 
 /**
+ * If mesh is valid, turn on leveling at startup
+ */
+#define ENABLE_LEVELING_ON_START
+
+/**
  * Normally G28 leaves leveling disabled on completion. Enable one of
  * these options to restore the prior leveling state or to always enable
  * leveling immediately after G28.
@@ -2349,6 +2354,7 @@
 #if ENABLED(EEPROM_SETTINGS)
   #define EEPROM_AUTO_INIT  // Init EEPROM automatically on any errors.
   #define EEPROM_INIT_NOW   // Init EEPROM on first boot after a new build.
+  #define EEPROM_INIT_NOW_KEEP_MESH  // Try to keep bed leveling mesh in EEPROM on first boot.
 #endif
 
 // @section host
