@@ -1592,7 +1592,7 @@
   //#define LONG_FILENAME_HOST_SUPPORT    // Get the long filename of a file/folder with 'M33 <dosname>' and list long filenames with 'M20 L'
   //#define LONG_FILENAME_WRITE_SUPPORT   // Create / delete files with long filenames via M28, M30, and Binary Transfer Protocol
 
-  //#define SCROLL_LONG_FILENAMES         // Scroll long filenames in the SD card menu
+  #define SCROLL_LONG_FILENAMES         // Scroll long filenames in the SD card menu
 
   //#define SD_ABORT_NO_COOLDOWN          // Leave the heaters on after Stop Print (not recommended!)
 
@@ -1625,7 +1625,7 @@
    * [1] On AVR an interrupt-capable pin is best for UHS3 compatibility.
    */
   #if USBHOST_HS_EN
-  #define USB_FLASH_DRIVE_SUPPORT
+  //#define USB_FLASH_DRIVE_SUPPORT
   #endif
   #if ENABLED(USB_FLASH_DRIVE_SUPPORT)
     /**
@@ -1707,7 +1707,7 @@
    * Adds 'M21 Pm' / 'M21 S' / 'M21 U' to mount SD Card / USB Drive.
    */
   #if USBHOST_HS_EN
-  #define MULTI_VOLUME
+  //#define MULTI_VOLUME
   #endif
   #if ENABLED(MULTI_VOLUME)
     #define VOLUME_SD_ONBOARD
