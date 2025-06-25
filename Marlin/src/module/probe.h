@@ -169,7 +169,7 @@ public:
   static void move_z_after_homing() {
     #ifdef Z_AFTER_HOMING
       do_z_clearance(Z_AFTER_HOMING, true);
-    #elif BOTH(Z_AFTER_PROBING, HAS_BED_PROBE)
+    #elif ALL(Z_AFTER_PROBING, HAS_BED_PROBE)
       move_z_after_probing();
     #endif
   }
