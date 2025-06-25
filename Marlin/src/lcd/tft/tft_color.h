@@ -30,6 +30,13 @@
 #define COLOR(color)          RGB(((color >> 16) & 0xFF), ((color >> 8) & 0xFF), (color & 0xFF))
 #define HALF(color)           RGB(RED(color) >> 1, GREEN(color) >> 1, BLUE(color) >> 1)
 
+constexpr uint16_t color_565_from_888(uint32_t color) {
+	const uint32_t red = (color >> 8) & 0xf800;
+	const uint32_t green = (color >> 5) & 0x7e0;
+	const uint32_t blue = (color >> 3) & 0x1f;
+	return red | green | blue;
+}
+
 // 16 bit color generator: https://ee-programming-notepad.blogspot.com/2016/10/16-bit-color-generator-picker.html
 // RGB565 color picker:  https://trolsoft.ru/en/articles/rgb565-color-picker
 
