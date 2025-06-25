@@ -1,3 +1,12 @@
+## Bed leveling
+Backlash Calibration for z ?!
+Motion > Bed level 
+> Tramming (while cold)
+> Preheat
+> Level bed
+> Bed height, adjust z offset to -<feeler gauge thickness>
+> Mesh mean to z offset
+
 ## Applicable printers
   - Support MCU: STM32F446Z or GD32F4xx
   - Version: 2.18.0 
@@ -82,6 +91,3 @@
 <img align="center" width=685 src="buildroot/share/pixmaps/tronxy/exti_mul_def.png" />
     open the file and comment out “void EXTI1_IRQHandler(void)”(according to the error message) function, as shown in the figure.
 <img align="center" width=685 src="buildroot/share/pixmaps/tronxy/comment_exti.png" />
-
-
-

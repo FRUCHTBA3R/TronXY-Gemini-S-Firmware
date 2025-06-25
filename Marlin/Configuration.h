@@ -397,7 +397,7 @@
 #if TRONXY_PROJ == PROJ_GEMINIS
 #define HOTEND_OFFSET_X { 0.0, 58.50 } // (mm) relative X-offset for each nozzle
 #define HOTEND_OFFSET_Y { 0.0, 0.00 }  // (mm) relative Y-offset for each nozzle
-#define HOTEND_OFFSET_Z { 0.0, 0.00 }  // (mm) relative Z-offset for each nozzle
+#define HOTEND_OFFSET_Z { 0.0, -0.05 } // (mm) relative Z-offset for each nozzle
 #elif TRONXY_PROJ == PROJ_GEMINIXS
 #define HOTEND_OFFSET_X { 0.0, 56.50 } // (mm) relative X-offset for each nozzle
 #define HOTEND_OFFSET_Y { 0.0, 0.00 }  // (mm) relative Y-offset for each nozzle
