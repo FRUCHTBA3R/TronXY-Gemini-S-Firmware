@@ -68,6 +68,8 @@ MAP(_N_LBL, LOGICAL_AXIS_NAMES); MAP(_SP_N_LBL, LOGICAL_AXIS_NAMES);
 
 #endif
 
+template <> void SERIAL_ECHO(const p_float_t pf) { SERIAL_IMPL.print(pf.value, pf.prec); }
+
 void serial_print_P(PGM_P str) {
   while (const char c = pgm_read_byte(str++)) SERIAL_CHAR(c);
 }

@@ -1855,6 +1855,10 @@ void setup() {
     SETUP_RUN(bdl.init(I2C_BD_SDA_PIN, I2C_BD_SCL_PIN, I2C_BD_DELAY));
   #endif
 
+  #if ENABLED(ENABLE_LEVELING_ON_START)
+    if(leveling_is_valid()) set_bed_leveling_enabled(true);
+  #endif
+  
   marlin_state = MF_RUNNING;
 
   SETUP_LOG("setup() completed.");

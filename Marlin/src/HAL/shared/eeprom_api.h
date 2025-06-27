@@ -43,6 +43,7 @@ public:
   static bool write_data(int &pos, const uint8_t *value, size_t size);
   static bool write_data(int &pos, const uint8_t *value, size_t size, uint16_t *crc) { return write_data(pos, value, size);};
   static bool read_data(int &pos, uint8_t *value, size_t size, const bool writing=true);
+  static bool read_data(int &pos, uint8_t *value, size_t size, uint16_t *crc, const bool writing=true) { return read_data(pos, value, size, writing);};
   #else
   // Write one or more bytes of data and update the CRC
   // Return 'true' on write error

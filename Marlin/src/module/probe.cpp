@@ -57,9 +57,9 @@
   float largest_sensorless_adj = 0;
 #endif
 
-#if EITHER(HAS_QUIET_PROBING, USE_SENSORLESS)
+#if ANY(HAS_QUIET_PROBING, USE_SENSORLESS)
   #include "stepper/indirection.h"
-  #if BOTH(HAS_QUIET_PROBING, PROBING_ESTEPPERS_OFF)
+  #if ALL(HAS_QUIET_PROBING, PROBING_ESTEPPERS_OFF)
     #include "stepper.h"
   #endif
   #if USE_SENSORLESS
@@ -82,7 +82,7 @@
   #include "../feature/host_actions.h" // for PROMPT_USER_CONTINUE
 #endif
 
-#if HAS_Z_SERVO_PROBE
+#if HAS_Z_SERVO_PROBE || HAS_MAG_MOUNTED_SERVO_PROBE
   #include "servo.h"
 #endif
 
@@ -96,8 +96,6 @@
 
 #if ENABLED(EXTENSIBLE_UI)
   #include "../lcd/extui/ui_api.h"
-#elif ENABLED(DWIN_LCD_PROUI)
-  #include "../lcd/e3v2/proui/dwin.h"
 #endif
 
 #define DEBUG_OUT ENABLED(DEBUG_LEVELING_FEATURE)
@@ -841,6 +839,28 @@ float Probe::run_z_probe(const bool sanity_check/*=true*/) {
 
   return measured_z;
 }
+
+#if DO_TOOLCHANGE_FOR_PROBING
+
+  #include "tool_change.h"
+
+  /**
+   * Switches to the appropriate tool (PROBING_TOOL) for probing (probing = true), and switches
+   * back to the old tool when probing = false. Uses statics to avoid unnecessary checks and to
+   * cache the previous tool, so always call with false after calling with true.
+   */
+  void Probe::use_probing_tool(const bool probing/*=true*/) {
+    static uint8_t old_tool;
+    static bool old_state = false;
+    if (probing == old_state) return;
+    old_state = probing;
+    if (probing) old_tool = active_extruder;
+    const uint8_t tool = probing ? PROBING_TOOL : old_tool;
+    if (tool != active_extruder)
+      tool_change(tool, ENABLED(PROBE_TOOLCHANGE_NO_MOVE));
+  }
+
+#endif
 
 /**
  * - Move to the given XY

@@ -192,7 +192,7 @@ typedef IF<(NUM_AXIS_ENUMS > 8), uint16_t, uint8_t>::type axis_bits_t;
 #define LOOP_DISTINCT_E(VAR) LOOP_L_N(VAR, DISTINCT_E)
 
 //
-// feedRate_t is just a humble float
+// feedRate_t is just a humble float that can represent mm/s or mm/min
 //
 typedef float feedRate_t;
 
@@ -215,9 +215,38 @@ typedef float celsius_float_t;
 typedef const_float_t const_feedRate_t;
 typedef const_float_t const_celsius_float_t;
 
+// Type large enough to count leveling grid points
+typedef IF<TERN0(ABL_USES_GRID, (GRID_MAX_POINTS > 255)), uint16_t, uint8_t>::type grid_count_t;
+
 // Conversion macros
 #define MMM_TO_MMS(MM_M) feedRate_t(static_cast<float>(MM_M) / 60.0f)
 #define MMS_TO_MMM(MM_S) (static_cast<float>(MM_S) * 60.0f)
+
+// Packaged types: float with precision and/or width; a repeated space/character
+typedef struct WFloat { float value; char width; char prec;
+                        WFloat(float v, char w, char p) : value(v), width(w), prec(p) {}
+                      } w_float_t;
+typedef struct PFloat { float value; char prec;
+                        PFloat(float v, char p) : value(v), prec(p) {}
+                      } p_float_t;
+typedef struct RepChr { char asc; int8_t count;
+                        RepChr(char a, uint8_t c) : asc(a), count(c) {}
+                      } repchr_t;
+typedef struct Spaces { int8_t count;
+                        Spaces(uint8_t c) : count(c) {}
+                      } spaces_t;
+
+#ifdef __AVR__
+  typedef w_float_t w_double_t;
+  typedef p_float_t p_double_t;
+#else
+  typedef struct WDouble { double value; char width; char prec;
+                          WDouble(double v, char w, char p) : value(v), width(w), prec(p) {}
+                        } w_double_t;
+  typedef struct PDouble { double value; char prec;
+                          PDouble(double v, char p) : value(v), prec(p) {}
+                        } p_double_t;
+#endif
 
 //
 // Coordinates structures for XY, XYZ, XYZE...
@@ -434,6 +463,11 @@ struct XYval {
   FI XYval<T>& operator*=(const int &v)                 { x *= v;    y *= v;    return *this; }
   FI XYval<T>& operator>>=(const int &v)                { _RS(x);    _RS(y);    return *this; }
   FI XYval<T>& operator<<=(const int &v)                { _LS(x);    _LS(y);    return *this; }
+
+  // Absolute difference between two objects
+  FI constexpr XYval<T> diff(const XYZEval<T> &rs) const { return { TERN(HAS_X_AXIS, T(_ABS(x - rs.x)), x), TERN(HAS_Y_AXIS, T(_ABS(y - rs.y)), y) }; }
+  FI constexpr XYval<T> diff(const XYZval<T>  &rs) const { return { TERN(HAS_X_AXIS, T(_ABS(x - rs.x)), x), TERN(HAS_Y_AXIS, T(_ABS(y - rs.y)), y) }; }
+  FI constexpr XYval<T> diff(const XYval<T>   &rs) const { return { T(_ABS(x - rs.x)), T(_ABS(y - rs.y)) }; }
 
   // Exact comparisons. For floats a "NEAR" operation may be better.
   FI bool      operator==(const XYval<T>   &rs)         { return x == rs.x && y == rs.y; }

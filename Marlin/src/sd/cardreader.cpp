@@ -55,7 +55,7 @@
   #include "../feature/pause.h"
 #endif
 
-#define DEBUG_OUT EITHER(DEBUG_CARDREADER, MARLIN_DEV_MODE)
+#define DEBUG_OUT ANY(DEBUG_CARDREADER, MARLIN_DEV_MODE)
 #include "../core/debug_out.h"
 #include "../libs/hex_print.h"
 
@@ -250,7 +250,7 @@ int CardReader::countItems(SdFile dir) {
 //
 void CardReader::selectByIndex(SdFile dir, const uint8_t index) {
   dir_t p;
-  for (uint8_t cnt = 0; dir.readDir(&p, longFilename) > 0;) {
+  for (int16_t cnt = 0; dir.readDir(&p, longFilename) > 0;) {
     if (is_visible_entity(p)) {
       if (cnt == index) {
         createFilename(filename, p);

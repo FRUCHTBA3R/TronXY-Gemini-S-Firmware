@@ -145,7 +145,7 @@ void GcodeSuite::M600() {
     if (parser.seenval('O')) park_point.w = parser.linearval('O')     // W axis
   );
   #if ENABLED(DUAL_X_CARRIAGE)
-    if(active_extruder)park_point.x = X2_MAX_POS - 10;
+    if (active_extruder) park_point.x = X_BED_SIZE - park_point.x;  // mirrored movement at other bed side
   #endif
 
   #if HAS_HOTEND_OFFSET && NONE(DUAL_X_CARRIAGE, DELTA)

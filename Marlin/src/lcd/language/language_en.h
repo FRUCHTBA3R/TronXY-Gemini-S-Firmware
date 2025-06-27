@@ -134,6 +134,7 @@ namespace Language_en {
     LSTR MSG_PREHEAT_M_SETTINGS           = _UxGT("Preheat $ Conf");
   #endif
   LSTR MSG_PREHEAT_CUSTOM                 = _UxGT("Preheat Custom");
+  LSTR MSG_PREHEAT                        = _UxGT("Preheat");
   LSTR MSG_COOLDOWN                       = _UxGT("Cooldown");
 
   LSTR MSG_CUTTER_FREQUENCY               = _UxGT("Frequency");
@@ -279,6 +280,7 @@ namespace Language_en {
   LSTR MSG_UBL_5_VALIDATE_MESH_MENU       = _UxGT("5. Validate Mesh");
   LSTR MSG_UBL_6_FINE_TUNE_ALL            = _UxGT("6. Fine Tune All");
   LSTR MSG_UBL_7_SAVE_MESH                = _UxGT("7. Save Bed Mesh");
+  LSTR MSG_MESH_MEAN_Z                    = _UxGT("Mesh Mean to Z Offset");
 
   LSTR MSG_LED_CONTROL                    = _UxGT("LED Control");
   LSTR MSG_LEDS                           = _UxGT("Lights");

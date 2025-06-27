@@ -8,7 +8,7 @@
 #define UI_SIM480X320      2
 
 #define TRONXY_PROJ        PROJ_GEMINIS
-#define TRONXY_UI          UI_SIM480X320
+#define TRONXY_UI          UI_MARLIN_DEFAULT  // UI_SIM480X320
 
 #if TRONXY_UI > 0
 #define HAS_TRONXY_UI      1
@@ -29,7 +29,7 @@
 #define DUAL_ZMAX_HOME            0 //Big end reset, reset in the opposite direction, then return to the forward direction to find 0 point
 #define Z_BED_MOVE                0 //Z-axis movement: hot bed
 #define EXTRUDERS                 2 //Number of extruders
-#define INVERT_E0_DIR             false //TITAN:true,true; BMG:false,true
+#define INVERT_E0_DIR             false //TITAN:true,true; BMG:false,true // using left and right versions of a dual drive extruder (BMG)
 #define INVERT_E1_DIR             true
 #define USE_EXTRUDER              2 //T,B TITAN:1,BMG:2,TAOLI:3,general:4
 // #define FIX_MOUNTED_PROBE

@@ -37,7 +37,7 @@
   #include "../../lcd/extui/ui_api.h"
 #endif
 
-//#define M420_C_USE_MEAN
+#define M420_C_USE_MEAN
 
 /**
  * M420: Enable/Disable Bed Leveling and/or set the Z fade height.
@@ -53,7 +53,7 @@
  *
  * With mesh-based leveling only:
  *
- *   C         Center mesh on the mean of the lowest and highest
+ *   C         Center mesh on the mean of the lowest and highest / mean of all points AND adjust z offset
  *
  * With MARLIN_DEV_MODE:
  *   S2        Create a simple random mesh and enable
@@ -182,8 +182,9 @@ void GcodeSuite::M420() {
               TERN_(EXTENSIBLE_UI, ExtUI::onMeshUpdate(x, y, bedlevel.z_values[x][y]));
             }
             TERN_(AUTO_BED_LEVELING_BILINEAR, bedlevel.refresh_bed_level());
+            /*TERN_(MESH_BED_LEVELING, */bedlevel.z_offset += zmean;
           }
-
+        
         #endif
       }
 

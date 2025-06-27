@@ -33,10 +33,15 @@
 
 class MarlinSettings {
   public:
+    enum ValidationState {
+      INVALID_AFTER_FLASH = -1,
+      INVALID,
+      VALID
+    };
     static uint16_t datasize();
 
     static void reset();
-    static bool save();    // Return 'true' if data was saved
+    static bool save(const bool first_save_after_flash = false);    // Return 'true' if data was saved
 
     FORCE_INLINE static bool init_eeprom() {
       reset();
@@ -57,8 +62,8 @@ class MarlinSettings {
     #if ENABLED(EEPROM_SETTINGS)
 
       static bool load();      // Return 'true' if data was loaded ok
-      static bool validate();  // Return 'true' if EEPROM data is ok
-  
+      static ValidationState validate();  // Return 'true' if EEPROM data is ok
+
       #if TRONXY_UI
       static void first_load();
       #else
@@ -110,7 +115,7 @@ class MarlinSettings {
                                           // live at the very end of the eeprom
       #endif
 
-      static bool _load();
+      static ValidationState _load();
       static bool size_error(const uint16_t size);
 
       static int eeprom_index;
