@@ -1324,7 +1324,8 @@ void tool_change(const uint8_t new_tool, bool no_move/*=false*/) {
       #endif
 
       // Return to position and lower again
-      const bool should_move = safe_to_move && !no_move && IsRunning();
+      const bool should_move = safe_to_move && !no_move && IsRunning()
+                                && position_is_reachable(destination);  // e.g. other tool was already parked
       if (should_move) {
 
         #if ANY(SINGLENOZZLE_STANDBY_TEMP, SINGLENOZZLE_STANDBY_FAN)
