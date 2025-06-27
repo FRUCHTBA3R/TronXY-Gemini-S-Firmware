@@ -613,14 +613,6 @@ static void drawCurZSelection() {
   }
 }
 
-static void drawCurESelection() {
-  tft.canvas(motionAxisState.eNamePos.x, motionAxisState.eNamePos.y, BTN_WIDTH, BTN_HEIGHT);
-  tft.set_background(COLOR_BACKGROUND);
-  tft_string.set('E');
-  tft.add_text(0, 0, E_BTN_COLOR , tft_string);
-  tft.add_text(tft_string.width(), 0, E_BTN_COLOR, ui8tostr3rj(motionAxisState.e_selection));
-}
-
 static void drawMessage(PGM_P const msg) {
   tft.canvas(X_MARGIN, TFT_HEIGHT - Y_MARGIN - 34, TFT_HEIGHT / 2, 34);
   tft.set_background(COLOR_BACKGROUND);
@@ -741,6 +733,9 @@ static void z_plus()  { moveAxis(Z_AXIS, 1);  }
 static void z_minus() { moveAxis(Z_AXIS, -1); }
 
 #if ENABLED(TOUCH_SCREEN)
+
+  static void drawCurESelection(const bool, const bool);  // for e_select
+
   static void e_select() {
     motionAxisState.e_selection++;
     if (motionAxisState.e_selection >= EXTRUDERS) {
@@ -748,7 +743,7 @@ static void z_minus() { moveAxis(Z_AXIS, -1); }
     }
 
     quick_feedback();
-    drawCurESelection();
+    drawCurESelection(true, true);  // enabled but don't add touch control again
     drawAxisValue(E_AXIS);
   }
 
@@ -786,7 +781,7 @@ static void disable_steppers() {
   queue.inject(F("M84"));
 }
 
-static void drawBtn(int x, int y, const char *label, intptr_t data, MarlinImage img, uint16_t bgColor, bool enabled = true) {
+static void drawBtn(int x, int y, const char *label, intptr_t data, MarlinImage img, uint16_t bgColor, bool enabled = true, bool redraw_only = false) {
   uint16_t width = Images[imgBtn52Rounded].width;
   uint16_t height = Images[imgBtn52Rounded].height;
 
@@ -806,7 +801,18 @@ static void drawBtn(int x, int y, const char *label, intptr_t data, MarlinImage 
     tft.add_image(0, 0, img, bgColor, COLOR_BACKGROUND, COLOR_DARKGREY);
   }
 
-  TERN_(HAS_TFT_XPT2046, if (enabled) touch.add_control(BUTTON, x, y, width, height, data));
+  TERN_(HAS_TFT_XPT2046, if (enabled && !redraw_only) touch.add_control(BUTTON, x, y, width, height, data));
+}
+
+static void drawCurESelection(const bool enabled, const bool redraw_only = false) {
+  //tft.canvas(motionAxisState.eNamePos.x, motionAxisState.eNamePos.y, BTN_WIDTH, BTN_HEIGHT);
+  //tft.set_background(COLOR_BACKGROUND);
+  //tft_string.set('E');
+  //tft.add_text(0, 0, E_BTN_COLOR , tft_string);
+  //tft.add_text(tft_string.width(), 0, E_BTN_COLOR, ui8tostr3rj(motionAxisState.e_selection));
+  char* e_label = (char*)(ui8tostr3rj(motionAxisState.e_selection) - 1);  // evil
+  e_label[0] = 'E';
+  drawBtn(motionAxisState.eNamePos.x, motionAxisState.eNamePos.y, e_label, (intptr_t)e_select, imgRefresh, E_BTN_COLOR, enabled, redraw_only);
 }
 
 void MarlinUI::move_axis_screen() {
@@ -850,8 +856,8 @@ void MarlinUI::move_axis_screen() {
 
   motionAxisState.eNamePos.x = x;
   motionAxisState.eNamePos.y = y;
-  drawCurESelection();
-  TERN_(HAS_TFT_XPT2046, if (!busy) touch.add_control(BUTTON, x, y, BTN_WIDTH, BTN_HEIGHT, (intptr_t)e_select));
+  drawCurESelection(!busy);
+  //TERN_(HAS_TFT_XPT2046, if (!busy) touch.add_control(BUTTON, x, y, BTN_WIDTH, BTN_HEIGHT, (intptr_t)e_select));
 
   x += BTN_WIDTH + spacing;
   drawBtn(x, y, "X-", (intptr_t)x_minus, imgLeft, X_BTN_COLOR, !busy);
