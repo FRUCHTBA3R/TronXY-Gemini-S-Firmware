@@ -805,14 +805,17 @@ static void drawBtn(int x, int y, const char *label, intptr_t data, MarlinImage 
 }
 
 static void drawCurESelection(const bool enabled, const bool redraw_only = false) {
-  //tft.canvas(motionAxisState.eNamePos.x, motionAxisState.eNamePos.y, BTN_WIDTH, BTN_HEIGHT);
-  //tft.set_background(COLOR_BACKGROUND);
-  //tft_string.set('E');
-  //tft.add_text(0, 0, E_BTN_COLOR , tft_string);
-  //tft.add_text(tft_string.width(), 0, E_BTN_COLOR, ui8tostr3rj(motionAxisState.e_selection));
-  char* e_label = (char*)(ui8tostr3rj(motionAxisState.e_selection) - 1);  // evil
-  e_label[0] = 'E';
-  drawBtn(motionAxisState.eNamePos.x, motionAxisState.eNamePos.y, e_label, (intptr_t)e_select, imgRefresh, E_BTN_COLOR, enabled, redraw_only);
+  #if !HAS_MULTI_EXTRUDER
+    tft.canvas(motionAxisState.eNamePos.x, motionAxisState.eNamePos.y, BTN_WIDTH, BTN_HEIGHT);
+    tft.set_background(COLOR_BACKGROUND);
+    tft_string.set('E');
+    tft.add_text(0, 0, E_BTN_COLOR , tft_string);
+    tft.add_text(tft_string.width(), 0, E_BTN_COLOR, ui8tostr3rj(motionAxisState.e_selection));
+  #else
+    char* e_label = (char*)(ui8tostr3rj(motionAxisState.e_selection) - 1);  // evil
+    e_label[0] = 'E';
+    drawBtn(motionAxisState.eNamePos.x, motionAxisState.eNamePos.y, e_label, (intptr_t)e_select, imgRefresh, E_BTN_COLOR, enabled, redraw_only);
+  #endif
 }
 
 void MarlinUI::move_axis_screen() {
